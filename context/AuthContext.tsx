@@ -1,65 +1,79 @@
 "use client";
 
-import { createContext, ReactNode, useContext, useState } from "react";
+import {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+import { authenticate, User } from "@/lib/auth";
 
-type Role = "admin" | "teacher" | "student" | "parent" | "superadmin";
-
-interface User {
-  name: string;
-  role: Role;
+interface LoginResult {
+  ok: boolean;
+  message?: string;
 }
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string) => void;
+  isHydrating: boolean;
+  login: (email: string, password: string) => LoginResult;
   logout: () => void;
 }
 
+const AUTH_STORAGE_KEY = "smsedu-user";
 const AuthContext = createContext<AuthContextType | null>(null);
 
-interface AuthProviderProps {
-  children: ReactNode;
-}
-
-export const AuthProvider = ({ children }: AuthProviderProps) => {
+export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [isHydrating, setIsHydrating] = useState(true);
 
-  const login = (email: string, _password: string) => {
-    // mock login
-    if (email === "admin@test.com") {
-      setUser({ name: "Admin", role: "admin" });
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(AUTH_STORAGE_KEY);
+      if (raw) {
+        setUser(JSON.parse(raw) as User);
+      }
+    } catch {
+      localStorage.removeItem(AUTH_STORAGE_KEY);
+    } finally {
+      setIsHydrating(false);
+    }
+  }, []);
+
+  const login = (email: string, password: string): LoginResult => {
+    const authenticatedUser = authenticate(email, password);
+    if (!authenticatedUser) {
+      return {
+        ok: false,
+        message:
+          "Invalid credentials. Use one of the demo accounts shown on the login screen.",
+      };
     }
 
-    if (email === "teacher@test.com") {
-      setUser({ name: "Teacher", role: "teacher" });
-    }
-
-    if (email === "student@test.com") {
-      setUser({ name: "Student", role: "student" });
-    }
-
-    if (email === "parent@test.com") {
-      setUser({ name: "Parent", role: "parent" });
-    }
-
-    if (email === "super@test.com") {
-      setUser({ name: "Super Admin", role: "superadmin" });
-    }
+    setUser(authenticatedUser);
+    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(authenticatedUser));
+    return { ok: true };
   };
 
-  const logout = () => setUser(null);
+  const logout = () => {
+    setUser(null);
+    localStorage.removeItem(AUTH_STORAGE_KEY);
+  };
 
-  return (
-    <AuthContext.Provider value={{ user, login, logout }}>
-      {children}
-    </AuthContext.Provider>
+  const value = useMemo(
+    () => ({ user, isHydrating, login, logout }),
+    [user, isHydrating],
   );
-};
 
-export const useAuth = () => {
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+}
+
+export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {
     throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
-};
+}

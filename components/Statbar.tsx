@@ -1,23 +1,20 @@
-export default function Sidebar({ role }: { role: string }) {
-  const menus: any = {
-    superadmin: ["Dashboard", "Schools", "Admins", "Theme Settings"],
+interface StatbarProps {
+  label: string;
+  value: number;
+}
 
-    admin: ["Dashboard", "Students", "Teachers", "Classes", "Attendance"],
-
-    teacher: ["Dashboard", "My Classes", "Assignments", "Grades"],
-
-    student: ["Dashboard", "Subjects", "Homework", "Results"],
-  };
+export default function Statbar({ label, value }: StatbarProps) {
+  const bounded = Math.max(0, Math.min(100, value));
 
   return (
-    <div className="w-64 border-r bg-white">
-      <div className="p-4 text-lg font-bold">School System</div>
-
-      {menus[role].map((item: string) => (
-        <div key={item} className="cursor-pointer p-3 hover:bg-gray-100">
-          {item}
-        </div>
-      ))}
+    <div className="rounded-lg border border-blue-100 bg-white p-3 shadow-sm">
+      <div className="mb-2 flex items-center justify-between text-sm">
+        <span className="text-slate-600">{label}</span>
+        <span className="font-semibold text-blue-900">{bounded}%</span>
+      </div>
+      <div className="h-2 rounded bg-blue-100">
+        <div className="h-2 rounded bg-blue-700" style={{ width: `${bounded}%` }} />
+      </div>
     </div>
   );
 }
