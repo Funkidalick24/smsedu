@@ -1,8 +1,35 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
+
 export default function Topbar() {
+  const { user, logout } = useAuth();
+  const router = useRouter();
+
+  const handleLogout = () => {
+    logout();
+    router.push("/login");
+  };
+
   return (
-    <header className="flex items-center justify-between border-b bg-white px-6 py-4">
-      <h2 className="text-lg font-semibold">Dashboard</h2>
-      <div className="text-sm text-gray-600">Welcome</div>
+    <header className="flex items-center justify-between border-b border-blue-100 bg-white/90 px-6 py-4 backdrop-blur">
+      <div>
+        <h2 className="text-lg font-semibold text-blue-900">SMSEdu Command Center</h2>
+        <p className="text-xs text-slate-500">Manage operations and monitor school activity.</p>
+      </div>
+      <div className="flex items-center gap-4">
+        <div className="text-right">
+          <p className="text-sm font-medium text-slate-700">{user?.name ?? "Guest"}</p>
+          <p className="text-xs uppercase tracking-wide text-blue-700">{user?.role ?? "-"}</p>
+        </div>
+        <button
+          className="rounded-lg bg-blue-700 px-3 py-2 text-sm text-white hover:bg-blue-800"
+          onClick={handleLogout}
+        >
+          Log out
+        </button>
+      </div>
     </header>
   );
 }
