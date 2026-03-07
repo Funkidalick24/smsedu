@@ -8,7 +8,7 @@ import {
   useMemo,
   useState,
 } from "react";
-import { authenticate, User } from "@/lib/auth";
+import { AuthUser } from "@/lib/auth";
 
 interface LoginResult {
   ok: boolean;
@@ -16,50 +16,49 @@ interface LoginResult {
 }
 
 interface AuthContextType {
-  user: User | null;
+  user: AuthUser | null;
   isHydrating: boolean;
-  login: (email: string, password: string) => LoginResult;
-  logout: () => void;
+  login: (email: string, password: string) => Promise<LoginResult>;
+  logout: () => Promise<void>;
 }
 
-const AUTH_STORAGE_KEY = "smsedu-user";
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [isHydrating, setIsHydrating] = useState(true);
 
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(AUTH_STORAGE_KEY);
-      if (raw) {
-        setUser(JSON.parse(raw) as User);
+    const hydrate = async () => {
+      try {
+        const response = await fetch("/api/auth/session", { cache: "no-store" });
+        const data = (await response.json()) as { user: AuthUser | null };
+        setUser(data.user ?? null);
+      } finally {
+        setIsHydrating(false);
       }
-    } catch {
-      localStorage.removeItem(AUTH_STORAGE_KEY);
-    } finally {
-      setIsHydrating(false);
-    }
+    };
+    void hydrate();
   }, []);
 
-  const login = (email: string, password: string): LoginResult => {
-    const authenticatedUser = authenticate(email, password);
-    if (!authenticatedUser) {
-      return {
-        ok: false,
-        message:
-          "Invalid credentials. Use one of the demo accounts shown on the login screen.",
-      };
+  const login = async (email: string, password: string): Promise<LoginResult> => {
+    const response = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+    const result = (await response.json()) as { ok: boolean; message?: string; user?: AuthUser };
+    if (!result.ok || !result.user) {
+      return { ok: false, message: result.message ?? "Unable to login." };
     }
 
-    setUser(authenticatedUser);
-    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(authenticatedUser));
+    setUser(result.user);
     return { ok: true };
   };
 
-  const logout = () => {
+  const logout = async () => {
+    await fetch("/api/auth/logout", { method: "POST" });
     setUser(null);
-    localStorage.removeItem(AUTH_STORAGE_KEY);
   };
 
   const value = useMemo(

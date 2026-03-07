@@ -2,8 +2,10 @@ import DashboardLayout from "@/components/DashboardLayout";
 import StatCard from "@/components/StatCard";
 import Table from "@/components/Table";
 import { parentChildren } from "@/lib/dashboardData";
+import { requireDashboardRole } from "@/lib/server/pageAuth";
 
-export default function ParentDashboard() {
+export default async function ParentDashboard() {
+  await requireDashboardRole("parent");
   return (
     <DashboardLayout role="parent">
       <h1 className="mb-6 text-3xl font-bold text-blue-950">Parent Dashboard</h1>

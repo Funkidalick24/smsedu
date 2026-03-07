@@ -7,8 +7,8 @@ export default function Topbar() {
   const { user, logout } = useAuth();
   const router = useRouter();
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     router.push("/login");
   };
 
@@ -25,7 +25,7 @@ export default function Topbar() {
         </div>
         <button
           className="rounded-lg bg-blue-700 px-3 py-2 text-sm text-white hover:bg-blue-800"
-          onClick={handleLogout}
+          onClick={() => void handleLogout()}
         >
           Log out
         </button>

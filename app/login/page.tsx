@@ -3,7 +3,7 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import { demoUsers, roleToDashboardPath } from "@/lib/auth";
+import { roleToDashboardPath } from "@/lib/auth";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -13,23 +13,23 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  const handleLogin = (event: FormEvent<HTMLFormElement>) => {
+  const handleLogin = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError("");
 
-    const result = login(email, password);
+    const result = await login(email, password);
     if (!result.ok) {
       setError(result.message ?? "Unable to login");
       return;
     }
 
-    const matchedUser = demoUsers[email.toLowerCase().trim()]?.user;
-    if (!matchedUser) {
+    const sessionResponse = await fetch("/api/auth/session", { cache: "no-store" });
+    const data = (await sessionResponse.json()) as { user: { role: Parameters<typeof roleToDashboardPath>[0] } | null };
+    if (!data.user) {
       setError("Unable to determine dashboard destination.");
       return;
     }
-
-    router.push(roleToDashboardPath(matchedUser.role));
+    router.push(roleToDashboardPath(data.user.role));
   };
 
   return (
@@ -42,12 +42,13 @@ export default function LoginPage() {
             parents, and super admins.
           </p>
           <div className="mt-6 space-y-2 text-xs">
-            <p className="font-semibold uppercase tracking-wide">Demo credentials</p>
-            {Object.entries(demoUsers).map(([demoEmail, { password: demoPassword, user }]) => (
-              <p key={demoEmail} className="rounded bg-blue-800/70 px-2 py-1">
-                {user.role}: {demoEmail} / {demoPassword}
-              </p>
-            ))}
+            <p className="font-semibold uppercase tracking-wide">Development default</p>
+            <p className="rounded bg-blue-800/70 px-2 py-1">
+              `admin@smsedu.local` / `Admin123!`
+            </p>
+            <p className="text-blue-200">
+              Change `DEFAULT_PASSWORD` in env for non-production seed users.
+            </p>
           </div>
         </section>
 
@@ -78,6 +79,10 @@ export default function LoginPage() {
           <button className="w-full rounded-lg bg-blue-700 p-2 font-medium text-white hover:bg-blue-800" type="submit">
             Login
           </button>
+
+          <a href="/forgot-password" className="mt-3 block text-center text-sm text-blue-700 hover:underline">
+            Forgot password?
+          </a>
         </form>
       </div>
     </div>

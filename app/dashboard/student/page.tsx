@@ -2,8 +2,10 @@ import DashboardLayout from "@/components/DashboardLayout";
 import StatCard from "@/components/StatCard";
 import Table from "@/components/Table";
 import { studentAssignments } from "@/lib/dashboardData";
+import { requireDashboardRole } from "@/lib/server/pageAuth";
 
-export default function StudentDashboard() {
+export default async function StudentDashboard() {
+  await requireDashboardRole("student");
   return (
     <DashboardLayout role="student">
       <h1 className="mb-6 text-3xl font-bold text-blue-950">Student Dashboard</h1>
