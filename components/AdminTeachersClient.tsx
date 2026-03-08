@@ -3,6 +3,10 @@
 import { FormEvent, useEffect, useState } from "react";
 import Table from "./Table";
 
+function FieldLabel({ children }: { children: string }) {
+  return <label className="mb-1 block text-sm font-medium text-slate-700">{children}</label>;
+}
+
 interface TeacherRow {
   id: number;
   employeeNo: string;
@@ -313,6 +317,7 @@ export default function AdminTeachersClient({
   const [activeTab, setActiveTab] = useState<TeacherFormTab>("personal");
   const [form, setForm] = useState<TeacherFormState>(initialForm);
   const [formError, setFormError] = useState("");
+  const [showRequiredHighlights, setShowRequiredHighlights] = useState(false);
   const [editingTeacherId, setEditingTeacherId] = useState<number | null>(null);
 
   const [viewTeacher, setViewTeacher] = useState<TeacherDetail | null>(null);
@@ -366,6 +371,7 @@ export default function AdminTeachersClient({
     setForm(initialForm);
     setFormError("");
     setActiveTab("personal");
+    setShowRequiredHighlights(false);
     setIsFormModalOpen(true);
   };
 
@@ -414,6 +420,7 @@ export default function AdminTeachersClient({
     setForm(initialForm);
     setFormError("");
     setActiveTab("personal");
+    setShowRequiredHighlights(false);
   };
 
   useEffect(() => {
@@ -427,6 +434,7 @@ export default function AdminTeachersClient({
         setForm(initialForm);
         setFormError("");
         setActiveTab("personal");
+        setShowRequiredHighlights(false);
       }
     };
     window.addEventListener("keydown", onEscape);
@@ -452,12 +460,14 @@ export default function AdminTeachersClient({
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setFormError("");
+    setShowRequiredHighlights(true);
     const validationError = validateRequired();
     if (validationError) {
       setFormError(validationError);
       return;
     }
 
+    setShowRequiredHighlights(false);
     setIsSaving(true);
     const payload = {
       ...form,
@@ -518,6 +528,11 @@ export default function AdminTeachersClient({
     setUploadFile(null);
     setIsUploading(false);
   };
+
+  const requiredInputClass = (missing: boolean) =>
+    `w-full rounded-lg border px-3 py-2 ${
+      showRequiredHighlights && missing ? "border-red-500 bg-red-50" : "border-blue-200"
+    }`;
 
   return (
     <>
@@ -623,41 +638,41 @@ export default function AdminTeachersClient({
               <div className="max-h-[60vh] overflow-y-auto p-6">
                 {activeTab === "personal" ? (
                   <section className="grid gap-4 md:grid-cols-2">
-                    <input value={form.firstName} onChange={(e) => setForm((p) => ({ ...p, firstName: e.target.value }))} placeholder="First Name *" className="w-full rounded-lg border border-blue-200 px-3 py-2" />
-                    <input value={form.middleName} onChange={(e) => setForm((p) => ({ ...p, middleName: e.target.value }))} placeholder="Middle Name" className="w-full rounded-lg border border-blue-200 px-3 py-2" />
-                    <input value={form.lastName} onChange={(e) => setForm((p) => ({ ...p, lastName: e.target.value }))} placeholder="Last Name *" className="w-full rounded-lg border border-blue-200 px-3 py-2" />
-                    <input type="date" value={form.dateOfBirth} onChange={(e) => setForm((p) => ({ ...p, dateOfBirth: e.target.value }))} className="w-full rounded-lg border border-blue-200 px-3 py-2" />
-                    <input value={form.gender} onChange={(e) => setForm((p) => ({ ...p, gender: e.target.value }))} placeholder="Gender" className="w-full rounded-lg border border-blue-200 px-3 py-2" />
-                    <input value={form.nationality} onChange={(e) => setForm((p) => ({ ...p, nationality: e.target.value }))} placeholder="Nationality" className="w-full rounded-lg border border-blue-200 px-3 py-2" />
+                    <div><FieldLabel>First Name *</FieldLabel><input value={form.firstName} onChange={(e) => setForm((p) => ({ ...p, firstName: e.target.value }))} className={requiredInputClass(!form.firstName.trim())} required /></div>
+                    <div><FieldLabel>Middle Name</FieldLabel><input value={form.middleName} onChange={(e) => setForm((p) => ({ ...p, middleName: e.target.value }))} className="w-full rounded-lg border border-blue-200 px-3 py-2" /></div>
+                    <div><FieldLabel>Last Name *</FieldLabel><input value={form.lastName} onChange={(e) => setForm((p) => ({ ...p, lastName: e.target.value }))} className={requiredInputClass(!form.lastName.trim())} required /></div>
+                    <div><FieldLabel>Date of Birth</FieldLabel><input type="date" value={form.dateOfBirth} onChange={(e) => setForm((p) => ({ ...p, dateOfBirth: e.target.value }))} className="w-full rounded-lg border border-blue-200 px-3 py-2" /></div>
+                    <div><FieldLabel>Gender</FieldLabel><input value={form.gender} onChange={(e) => setForm((p) => ({ ...p, gender: e.target.value }))} className="w-full rounded-lg border border-blue-200 px-3 py-2" /></div>
+                    <div><FieldLabel>Nationality</FieldLabel><input value={form.nationality} onChange={(e) => setForm((p) => ({ ...p, nationality: e.target.value }))} className="w-full rounded-lg border border-blue-200 px-3 py-2" /></div>
                   </section>
                 ) : null}
 
                 {activeTab === "contact" ? (
                   <section className="grid gap-4 md:grid-cols-2">
-                    <input value={form.phoneNumber} onChange={(e) => setForm((p) => ({ ...p, phoneNumber: e.target.value }))} placeholder="Phone Number *" className="w-full rounded-lg border border-blue-200 px-3 py-2" />
-                    <input type="email" value={form.email} onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))} placeholder="Email Address *" className="w-full rounded-lg border border-blue-200 px-3 py-2" />
-                    <input value={form.addressLine} onChange={(e) => setForm((p) => ({ ...p, addressLine: e.target.value }))} placeholder="Home Address" className="w-full rounded-lg border border-blue-200 px-3 py-2" />
-                    <input value={form.city} onChange={(e) => setForm((p) => ({ ...p, city: e.target.value }))} placeholder="City / Town" className="w-full rounded-lg border border-blue-200 px-3 py-2" />
+                    <div><FieldLabel>Phone Number *</FieldLabel><input value={form.phoneNumber} onChange={(e) => setForm((p) => ({ ...p, phoneNumber: e.target.value }))} className={requiredInputClass(!form.phoneNumber.trim())} required /></div>
+                    <div><FieldLabel>Email Address *</FieldLabel><input type="email" value={form.email} onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))} className={requiredInputClass(!form.email.trim())} required /></div>
+                    <div><FieldLabel>Home Address</FieldLabel><input value={form.addressLine} onChange={(e) => setForm((p) => ({ ...p, addressLine: e.target.value }))} className="w-full rounded-lg border border-blue-200 px-3 py-2" /></div>
+                    <div><FieldLabel>City / Town</FieldLabel><input value={form.city} onChange={(e) => setForm((p) => ({ ...p, city: e.target.value }))} className="w-full rounded-lg border border-blue-200 px-3 py-2" /></div>
                   </section>
                 ) : null}
 
                 {activeTab === "employment" ? (
                   <section className="grid gap-4 md:grid-cols-2">
-                    <input value={form.employeeNo} onChange={(e) => setForm((p) => ({ ...p, employeeNo: e.target.value }))} placeholder="Employee ID *" className="w-full rounded-lg border border-blue-200 px-3 py-2" />
-                    <input type="date" value={form.employmentDate} onChange={(e) => setForm((p) => ({ ...p, employmentDate: e.target.value }))} className="w-full rounded-lg border border-blue-200 px-3 py-2" />
-                    <input value={form.department} onChange={(e) => setForm((p) => ({ ...p, department: e.target.value }))} placeholder="Department *" className="w-full rounded-lg border border-blue-200 px-3 py-2" />
-                    <input value={form.status} onChange={(e) => setForm((p) => ({ ...p, status: e.target.value }))} placeholder="Status" className="w-full rounded-lg border border-blue-200 px-3 py-2" />
-                    <input value={form.employmentCategory} onChange={(e) => setForm((p) => ({ ...p, employmentCategory: e.target.value }))} placeholder="Government / School-employed" className="w-full rounded-lg border border-blue-200 px-3 py-2" />
-                    <input value={form.contractType} onChange={(e) => setForm((p) => ({ ...p, contractType: e.target.value }))} placeholder="Contract / Permanent" className="w-full rounded-lg border border-blue-200 px-3 py-2" />
-                    <input type="number" value={form.yearsOfService} onChange={(e) => setForm((p) => ({ ...p, yearsOfService: e.target.value }))} placeholder="Years of Service" className="w-full rounded-lg border border-blue-200 px-3 py-2" />
+                    <div><FieldLabel>Employee ID *</FieldLabel><input value={form.employeeNo} onChange={(e) => setForm((p) => ({ ...p, employeeNo: e.target.value }))} className={requiredInputClass(!form.employeeNo.trim())} required /></div>
+                    <div><FieldLabel>Employment Date *</FieldLabel><input type="date" value={form.employmentDate} onChange={(e) => setForm((p) => ({ ...p, employmentDate: e.target.value }))} className={requiredInputClass(!form.employmentDate.trim())} required /></div>
+                    <div><FieldLabel>Department *</FieldLabel><input value={form.department} onChange={(e) => setForm((p) => ({ ...p, department: e.target.value }))} className={requiredInputClass(!form.department.trim())} required /></div>
+                    <div><FieldLabel>Status</FieldLabel><input value={form.status} onChange={(e) => setForm((p) => ({ ...p, status: e.target.value }))} className="w-full rounded-lg border border-blue-200 px-3 py-2" /></div>
+                    <div><FieldLabel>Employment Category</FieldLabel><input value={form.employmentCategory} onChange={(e) => setForm((p) => ({ ...p, employmentCategory: e.target.value }))} className="w-full rounded-lg border border-blue-200 px-3 py-2" /></div>
+                    <div><FieldLabel>Contract Type</FieldLabel><input value={form.contractType} onChange={(e) => setForm((p) => ({ ...p, contractType: e.target.value }))} className="w-full rounded-lg border border-blue-200 px-3 py-2" /></div>
+                    <div><FieldLabel>Years of Service</FieldLabel><input type="number" value={form.yearsOfService} onChange={(e) => setForm((p) => ({ ...p, yearsOfService: e.target.value }))} className="w-full rounded-lg border border-blue-200 px-3 py-2" /></div>
                   </section>
                 ) : null}
 
                 {activeTab === "teaching" ? (
                   <section className="space-y-4">
                     <div className="grid gap-4 md:grid-cols-2">
-                      <input value={form.primarySubject} onChange={(e) => setForm((p) => ({ ...p, primarySubject: e.target.value }))} placeholder="Primary Subject" className="w-full rounded-lg border border-blue-200 px-3 py-2" />
-                      <input value={form.secondarySubject} onChange={(e) => setForm((p) => ({ ...p, secondarySubject: e.target.value }))} placeholder="Secondary Subject" className="w-full rounded-lg border border-blue-200 px-3 py-2" />
+                      <div><FieldLabel>Primary Subject</FieldLabel><input value={form.primarySubject} onChange={(e) => setForm((p) => ({ ...p, primarySubject: e.target.value }))} className="w-full rounded-lg border border-blue-200 px-3 py-2" /></div>
+                      <div><FieldLabel>Secondary Subject</FieldLabel><input value={form.secondarySubject} onChange={(e) => setForm((p) => ({ ...p, secondarySubject: e.target.value }))} className="w-full rounded-lg border border-blue-200 px-3 py-2" /></div>
                     </div>
                     <div>
                       <p className="mb-2 text-sm font-medium text-slate-700">Subjects Assigned</p>
@@ -694,27 +709,27 @@ export default function AdminTeachersClient({
 
                 {activeTab === "qualifications" ? (
                   <section className="grid gap-4 md:grid-cols-2">
-                    <input value={form.highestQualification} onChange={(e) => setForm((p) => ({ ...p, highestQualification: e.target.value }))} placeholder="Highest Qualification" className="w-full rounded-lg border border-blue-200 px-3 py-2" />
-                    <input value={form.specializations} onChange={(e) => setForm((p) => ({ ...p, specializations: e.target.value }))} placeholder="Specializations" className="w-full rounded-lg border border-blue-200 px-3 py-2" />
-                    <input value={form.teacherRegistrationNumber} onChange={(e) => setForm((p) => ({ ...p, teacherRegistrationNumber: e.target.value }))} placeholder="Teacher Registration Number" className="w-full rounded-lg border border-blue-200 px-3 py-2" />
-                    <input value={form.teachingCouncilRegistration} onChange={(e) => setForm((p) => ({ ...p, teachingCouncilRegistration: e.target.value }))} placeholder="Teaching Council Registration" className="w-full rounded-lg border border-blue-200 px-3 py-2" />
-                    <input value={form.teachingCertificateNumber} onChange={(e) => setForm((p) => ({ ...p, teachingCertificateNumber: e.target.value }))} placeholder="Teaching Certificate Number" className="w-full rounded-lg border border-blue-200 px-3 py-2" />
-                    <input value={form.teacherTrainingCollege} onChange={(e) => setForm((p) => ({ ...p, teacherTrainingCollege: e.target.value }))} placeholder="Teacher Training College" className="w-full rounded-lg border border-blue-200 px-3 py-2" />
-                    <input value={form.universityQualification} onChange={(e) => setForm((p) => ({ ...p, universityQualification: e.target.value }))} placeholder="University Qualification" className="w-full rounded-lg border border-blue-200 px-3 py-2" />
+                    <div><FieldLabel>Highest Qualification</FieldLabel><input value={form.highestQualification} onChange={(e) => setForm((p) => ({ ...p, highestQualification: e.target.value }))} className="w-full rounded-lg border border-blue-200 px-3 py-2" /></div>
+                    <div><FieldLabel>Specializations</FieldLabel><input value={form.specializations} onChange={(e) => setForm((p) => ({ ...p, specializations: e.target.value }))} className="w-full rounded-lg border border-blue-200 px-3 py-2" /></div>
+                    <div><FieldLabel>Teacher Registration Number</FieldLabel><input value={form.teacherRegistrationNumber} onChange={(e) => setForm((p) => ({ ...p, teacherRegistrationNumber: e.target.value }))} className="w-full rounded-lg border border-blue-200 px-3 py-2" /></div>
+                    <div><FieldLabel>Teaching Council Registration</FieldLabel><input value={form.teachingCouncilRegistration} onChange={(e) => setForm((p) => ({ ...p, teachingCouncilRegistration: e.target.value }))} className="w-full rounded-lg border border-blue-200 px-3 py-2" /></div>
+                    <div><FieldLabel>Teaching Certificate Number</FieldLabel><input value={form.teachingCertificateNumber} onChange={(e) => setForm((p) => ({ ...p, teachingCertificateNumber: e.target.value }))} className="w-full rounded-lg border border-blue-200 px-3 py-2" /></div>
+                    <div><FieldLabel>Teacher Training College</FieldLabel><input value={form.teacherTrainingCollege} onChange={(e) => setForm((p) => ({ ...p, teacherTrainingCollege: e.target.value }))} className="w-full rounded-lg border border-blue-200 px-3 py-2" /></div>
+                    <div><FieldLabel>University Qualification</FieldLabel><input value={form.universityQualification} onChange={(e) => setForm((p) => ({ ...p, universityQualification: e.target.value }))} className="w-full rounded-lg border border-blue-200 px-3 py-2" /></div>
                   </section>
                 ) : null}
 
                 {activeTab === "payroll" ? (
                   <section className="grid gap-4 md:grid-cols-2">
-                    <input type="number" value={form.salary} onChange={(e) => setForm((p) => ({ ...p, salary: e.target.value }))} placeholder="Salary" className="w-full rounded-lg border border-blue-200 px-3 py-2" />
-                    <input value={form.paymentMethod} onChange={(e) => setForm((p) => ({ ...p, paymentMethod: e.target.value }))} placeholder="Payment Method" className="w-full rounded-lg border border-blue-200 px-3 py-2" />
+                    <div><FieldLabel>Salary</FieldLabel><input type="number" value={form.salary} onChange={(e) => setForm((p) => ({ ...p, salary: e.target.value }))} className="w-full rounded-lg border border-blue-200 px-3 py-2" /></div>
+                    <div><FieldLabel>Payment Method</FieldLabel><input value={form.paymentMethod} onChange={(e) => setForm((p) => ({ ...p, paymentMethod: e.target.value }))} className="w-full rounded-lg border border-blue-200 px-3 py-2" /></div>
                   </section>
                 ) : null}
 
                 {activeTab === "emergency" ? (
                   <section className="grid gap-4 md:grid-cols-2">
-                    <input value={form.emergencyContactName} onChange={(e) => setForm((p) => ({ ...p, emergencyContactName: e.target.value }))} placeholder="Emergency Contact Name" className="w-full rounded-lg border border-blue-200 px-3 py-2" />
-                    <input value={form.emergencyContactPhone} onChange={(e) => setForm((p) => ({ ...p, emergencyContactPhone: e.target.value }))} placeholder="Emergency Contact Phone" className="w-full rounded-lg border border-blue-200 px-3 py-2" />
+                    <div><FieldLabel>Emergency Contact Name</FieldLabel><input value={form.emergencyContactName} onChange={(e) => setForm((p) => ({ ...p, emergencyContactName: e.target.value }))} className="w-full rounded-lg border border-blue-200 px-3 py-2" /></div>
+                    <div><FieldLabel>Emergency Contact Phone</FieldLabel><input value={form.emergencyContactPhone} onChange={(e) => setForm((p) => ({ ...p, emergencyContactPhone: e.target.value }))} className="w-full rounded-lg border border-blue-200 px-3 py-2" /></div>
                   </section>
                 ) : null}
               </div>
@@ -761,16 +776,22 @@ export default function AdminTeachersClient({
             </div>
 
             <form className="mb-4 grid gap-3 md:grid-cols-3" onSubmit={uploadDocument}>
-              <select value={uploadType} onChange={(e) => setUploadType(e.target.value)} className="rounded-lg border border-blue-200 px-3 py-2 text-sm">
-                <option>Teaching Certificate</option>
-                <option>Degree Certificate</option>
-                <option>National ID Copy</option>
-                <option>Employment Contract</option>
-                <option>Resume / CV</option>
-                <option>Background Check</option>
-                <option>Other</option>
-              </select>
-              <input type="file" onChange={(e) => setUploadFile(e.target.files?.[0] ?? null)} className="rounded-lg border border-blue-200 px-3 py-2 text-sm" />
+              <div>
+                <FieldLabel>Document Type</FieldLabel>
+                <select value={uploadType} onChange={(e) => setUploadType(e.target.value)} className="w-full rounded-lg border border-blue-200 px-3 py-2 text-sm">
+                  <option>Teaching Certificate</option>
+                  <option>Degree Certificate</option>
+                  <option>National ID Copy</option>
+                  <option>Employment Contract</option>
+                  <option>Resume / CV</option>
+                  <option>Background Check</option>
+                  <option>Other</option>
+                </select>
+              </div>
+              <div>
+                <FieldLabel>Upload File</FieldLabel>
+                <input type="file" onChange={(e) => setUploadFile(e.target.files?.[0] ?? null)} className="w-full rounded-lg border border-blue-200 px-3 py-2 text-sm" />
+              </div>
               <button type="submit" className="rounded-lg bg-blue-700 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-800 disabled:opacity-60" disabled={isUploading}>{isUploading ? "Uploading..." : "Upload"}</button>
             </form>
 
