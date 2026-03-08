@@ -1,15 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import DashboardLayout from "./DashboardLayout";
 import Table from "./Table";
 import { superAdminChecks } from "@/lib/dashboardData";
+import { useTheme } from "@/context/ThemeContext";
 
 export default function SuperAdminDashboardClient() {
-  const [color, setColor] = useState("#1d4ed8");
+  const { primaryColor, setPrimaryColor, resetPrimaryColor } = useTheme();
+  const [color, setColor] = useState(primaryColor);
+  const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    setColor(primaryColor);
+  }, [primaryColor]);
 
   const updateTheme = () => {
-    document.documentElement.style.setProperty("--color-primary", color);
+    setPrimaryColor(color);
+    setMessage("Theme color updated.");
   };
 
   return (
@@ -32,11 +40,20 @@ export default function SuperAdminDashboardClient() {
           />
           <button
             onClick={updateTheme}
-            className="rounded-lg bg-blue-700 px-4 py-2 text-white hover:bg-blue-800"
+            className="rounded-lg px-4 py-2 text-white"
+            style={{ backgroundColor: "var(--color-primary)" }}
           >
             Apply Theme
           </button>
+          <button
+            onClick={resetPrimaryColor}
+            className="rounded-lg border px-4 py-2 text-sm"
+            style={{ borderColor: "var(--color-border)", color: "var(--color-primary-strong)" }}
+          >
+            Reset Default
+          </button>
         </div>
+        {message ? <p className="mt-3 text-sm text-slate-600">{message}</p> : null}
       </section>
 
       <section>

@@ -33,7 +33,7 @@ export default function DashboardLayout({ children, role }: DashboardLayoutProps
 
   if (isHydrating || !user || user.role !== role) {
     return (
-      <div className="flex min-h-screen items-center justify-center text-blue-900">
+      <div className="flex min-h-screen items-center justify-center" style={{ color: "var(--color-primary-strong)" }}>
         Loading dashboard...
       </div>
     );

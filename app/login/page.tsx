@@ -43,9 +43,13 @@ export default function LoginPage() {
           </p>
           <div className="mt-6 space-y-2 text-xs">
             <p className="font-semibold uppercase tracking-wide">Development default</p>
-            <p className="rounded bg-blue-800/70 px-2 py-1">
-              `admin@smsedu.local` / `Admin123!`
-            </p>
+            <p className="rounded bg-blue-800/70 px-2 py-1">Admin: admin@smsedu.local / Admin123!</p>
+            <p className="rounded bg-blue-800/70 px-2 py-1">Teacher: teacher@smsedu.local / Admin123!</p>
+            <p className="rounded bg-blue-800/70 px-2 py-1">Student: student@smsedu.local / Admin123!</p>
+            <p className="rounded bg-blue-800/70 px-2 py-1">Parent: parent@smsedu.local / Admin123!</p>
+            <p className="rounded bg-blue-800/70 px-2 py-1">Super Admin: super@smsedu.local / Admin123!</p>
+            <p className="rounded bg-blue-800/70 px-2 py-1">Principal: principal@smsedu.local / Admin123!</p>
+            <p className="rounded bg-blue-800/70 px-2 py-1">Headmaster: headmaster@smsedu.local / Admin123!</p>
             <p className="text-blue-200">
               Change `DEFAULT_PASSWORD` in env for non-production seed users.
             </p>

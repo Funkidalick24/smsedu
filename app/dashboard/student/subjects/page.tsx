@@ -1,15 +1,13 @@
 import DashboardLayout from "@/components/DashboardLayout";
-import ModulePlaceholder from "@/components/ModulePlaceholder";
+import StudentSubjectsClient from "@/components/StudentSubjectsClient";
 import { requireDashboardRole } from "@/lib/server/pageAuth";
 
 export default async function StudentSubjectsPage() {
   await requireDashboardRole("student");
   return (
     <DashboardLayout role="student">
-      <ModulePlaceholder
-        title="Subjects"
-        description="Subject timetables, learning resources, and instructor notes will be shown here."
-      />
+      <h1 className="mb-6 text-3xl font-bold text-blue-950">Subjects</h1>
+      <StudentSubjectsClient />
     </DashboardLayout>
   );
 }

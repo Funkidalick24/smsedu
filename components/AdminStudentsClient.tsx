@@ -42,16 +42,28 @@ interface StudentFormState {
   nationality: string;
   email: string;
   admissionNo: string;
+  birthCertificateNumber: string;
+  schoolLevel: "Primary" | "Secondary";
+  formLevel: string;
+  classStream: string;
   admissionDate: string;
   gradeLevel: string;
   sectionStream: string;
   academicYear: string;
   transferStatus: string;
   previousSchool: string;
+  previousSchoolAddress: string;
+  grade7ExamCentreNumber: string;
+  grade7CandidateNumber: string;
+  grade7Results: string;
+  zimsecIndexNumber: string;
+  curriculumType: string;
+  houseName: string;
   classId: string;
   guardian1Name: string;
   guardian1Relationship: string;
   guardian1Phone: string;
+  guardian1NationalIdNumber: string;
   guardian1Email: string;
   guardian1Occupation: string;
   guardian1Address: string;
@@ -59,6 +71,8 @@ interface StudentFormState {
   emergencyContactPhone: string;
   emergencyContactRelationship: string;
   knownConditions: string;
+  immunisationRecord: string;
+  medicalAidProvider: string;
   allergies: string;
   medications: string;
   bloodType: string;
@@ -76,16 +90,28 @@ const initialForm: StudentFormState = {
   nationality: "",
   email: "",
   admissionNo: "",
+  birthCertificateNumber: "",
+  schoolLevel: "Primary",
+  formLevel: "",
+  classStream: "",
   admissionDate: new Date().toISOString().slice(0, 10),
   gradeLevel: "",
   sectionStream: "",
   academicYear: "",
   transferStatus: "",
   previousSchool: "",
+  previousSchoolAddress: "",
+  grade7ExamCentreNumber: "",
+  grade7CandidateNumber: "",
+  grade7Results: "",
+  zimsecIndexNumber: "",
+  curriculumType: "Heritage-Based Curriculum",
+  houseName: "",
   classId: "",
   guardian1Name: "",
   guardian1Relationship: "",
   guardian1Phone: "",
+  guardian1NationalIdNumber: "",
   guardian1Email: "",
   guardian1Occupation: "",
   guardian1Address: "",
@@ -93,6 +119,8 @@ const initialForm: StudentFormState = {
   emergencyContactPhone: "",
   emergencyContactRelationship: "",
   knownConditions: "",
+  immunisationRecord: "",
+  medicalAidProvider: "",
   allergies: "",
   medications: "",
   bloodType: "",
@@ -166,9 +194,13 @@ export default function AdminStudentsClient({ initialStudents, initialClasses }:
       setActiveTab("personal");
       return "Complete required fields in Personal Information.";
     }
-    if (!form.admissionNo || !form.admissionDate || !form.gradeLevel) {
+    if (!form.admissionNo || !form.admissionDate || !form.gradeLevel || !form.birthCertificateNumber) {
       setActiveTab("academic");
       return "Complete required fields in Academic Information.";
+    }
+    if (form.schoolLevel === "Secondary" && !form.formLevel) {
+      setActiveTab("academic");
+      return "Form level is required for secondary students.";
     }
     if (!form.guardian1Name || !form.guardian1Relationship || !form.guardian1Phone) {
       setActiveTab("guardian");
@@ -379,6 +411,14 @@ export default function AdminStudentsClient({ initialStudents, initialClasses }:
                       />
                     </div>
                     <div>
+                      <label className="mb-1 block text-sm font-medium text-slate-700">Birth Certificate Number</label>
+                      <input
+                        value={form.birthCertificateNumber}
+                        onChange={(event) => setForm((prev) => ({ ...prev, birthCertificateNumber: event.target.value }))}
+                        className="w-full rounded-lg border border-blue-200 px-3 py-2"
+                      />
+                    </div>
+                    <div>
                       <label className="mb-1 block text-sm font-medium text-slate-700">Admission Date</label>
                       <input
                         type="date"
@@ -388,10 +428,39 @@ export default function AdminStudentsClient({ initialStudents, initialClasses }:
                       />
                     </div>
                     <div>
+                      <label className="mb-1 block text-sm font-medium text-slate-700">School Level</label>
+                      <select
+                        value={form.schoolLevel}
+                        onChange={(event) =>
+                          setForm((prev) => ({ ...prev, schoolLevel: event.target.value as "Primary" | "Secondary" }))
+                        }
+                        className="w-full rounded-lg border border-blue-200 px-3 py-2"
+                      >
+                        <option value="Primary">Primary</option>
+                        <option value="Secondary">Secondary</option>
+                      </select>
+                    </div>
+                    <div>
                       <label className="mb-1 block text-sm font-medium text-slate-700">Grade Level</label>
                       <input
                         value={form.gradeLevel}
                         onChange={(event) => setForm((prev) => ({ ...prev, gradeLevel: event.target.value }))}
+                        className="w-full rounded-lg border border-blue-200 px-3 py-2"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-slate-700">Form Level (Secondary)</label>
+                      <input
+                        value={form.formLevel}
+                        onChange={(event) => setForm((prev) => ({ ...prev, formLevel: event.target.value }))}
+                        className="w-full rounded-lg border border-blue-200 px-3 py-2"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-slate-700">Class Stream</label>
+                      <input
+                        value={form.classStream}
+                        onChange={(event) => setForm((prev) => ({ ...prev, classStream: event.target.value }))}
                         className="w-full rounded-lg border border-blue-200 px-3 py-2"
                       />
                     </div>
@@ -442,6 +511,67 @@ export default function AdminStudentsClient({ initialStudents, initialClasses }:
                         className="w-full rounded-lg border border-blue-200 px-3 py-2"
                       />
                     </div>
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-slate-700">Previous School Address</label>
+                      <input
+                        value={form.previousSchoolAddress}
+                        onChange={(event) => setForm((prev) => ({ ...prev, previousSchoolAddress: event.target.value }))}
+                        className="w-full rounded-lg border border-blue-200 px-3 py-2"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-slate-700">Grade 7 Centre Number</label>
+                      <input
+                        value={form.grade7ExamCentreNumber}
+                        onChange={(event) => setForm((prev) => ({ ...prev, grade7ExamCentreNumber: event.target.value }))}
+                        className="w-full rounded-lg border border-blue-200 px-3 py-2"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-slate-700">Grade 7 Candidate Number</label>
+                      <input
+                        value={form.grade7CandidateNumber}
+                        onChange={(event) => setForm((prev) => ({ ...prev, grade7CandidateNumber: event.target.value }))}
+                        className="w-full rounded-lg border border-blue-200 px-3 py-2"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-slate-700">Grade 7 Results</label>
+                      <input
+                        value={form.grade7Results}
+                        onChange={(event) => setForm((prev) => ({ ...prev, grade7Results: event.target.value }))}
+                        className="w-full rounded-lg border border-blue-200 px-3 py-2"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-slate-700">ZIMSEC Index Number</label>
+                      <input
+                        value={form.zimsecIndexNumber}
+                        onChange={(event) => setForm((prev) => ({ ...prev, zimsecIndexNumber: event.target.value }))}
+                        className="w-full rounded-lg border border-blue-200 px-3 py-2"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-slate-700">Curriculum Type</label>
+                      <select
+                        value={form.curriculumType}
+                        onChange={(event) => setForm((prev) => ({ ...prev, curriculumType: event.target.value }))}
+                        className="w-full rounded-lg border border-blue-200 px-3 py-2"
+                      >
+                        <option value="Heritage-Based Curriculum">Heritage-Based Curriculum</option>
+                        <option value="Cambridge">Cambridge</option>
+                        <option value="International Baccalaureate">International Baccalaureate</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-slate-700">House Name</label>
+                      <input
+                        value={form.houseName}
+                        onChange={(event) => setForm((prev) => ({ ...prev, houseName: event.target.value }))}
+                        placeholder="Mhofu, Shumba, Nzou..."
+                        className="w-full rounded-lg border border-blue-200 px-3 py-2"
+                      />
+                    </div>
                   </section>
                 ) : null}
 
@@ -468,6 +598,14 @@ export default function AdminStudentsClient({ initialStudents, initialClasses }:
                       <input
                         value={form.guardian1Phone}
                         onChange={(event) => setForm((prev) => ({ ...prev, guardian1Phone: event.target.value }))}
+                        className="w-full rounded-lg border border-blue-200 px-3 py-2"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-slate-700">Guardian National ID</label>
+                      <input
+                        value={form.guardian1NationalIdNumber}
+                        onChange={(event) => setForm((prev) => ({ ...prev, guardian1NationalIdNumber: event.target.value }))}
                         className="w-full rounded-lg border border-blue-200 px-3 py-2"
                       />
                     </div>
@@ -522,6 +660,22 @@ export default function AdminStudentsClient({ initialStudents, initialClasses }:
                       <input
                         value={form.knownConditions}
                         onChange={(event) => setForm((prev) => ({ ...prev, knownConditions: event.target.value }))}
+                        className="w-full rounded-lg border border-blue-200 px-3 py-2"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-slate-700">Immunisation Record</label>
+                      <input
+                        value={form.immunisationRecord}
+                        onChange={(event) => setForm((prev) => ({ ...prev, immunisationRecord: event.target.value }))}
+                        className="w-full rounded-lg border border-blue-200 px-3 py-2"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-slate-700">Medical Aid Provider</label>
+                      <input
+                        value={form.medicalAidProvider}
+                        onChange={(event) => setForm((prev) => ({ ...prev, medicalAidProvider: event.target.value }))}
                         className="w-full rounded-lg border border-blue-200 px-3 py-2"
                       />
                     </div>

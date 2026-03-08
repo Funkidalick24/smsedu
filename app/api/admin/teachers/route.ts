@@ -33,6 +33,16 @@ interface CreateTeacherBody {
   highestQualification?: string;
   degrees?: string;
   teachingCertification?: string;
+  teacherRegistrationNumber?: string;
+  teachingCouncilRegistration?: string;
+  teachingCertificateNumber?: string;
+  teacherTrainingCollege?: string;
+  universityQualification?: string;
+  primarySubject?: string;
+  secondarySubject?: string;
+  employmentCategory?: string;
+  contractType?: string;
+  yearsOfService?: number | null;
   professionalLicenseNumber?: string;
   specializations?: string;
   yearsExperience?: number | null;
@@ -140,6 +150,16 @@ export async function POST(request: Request) {
       highestQualification: body.highestQualification?.trim(),
       degrees: body.degrees?.trim(),
       teachingCertification: body.teachingCertification?.trim(),
+      teacherRegistrationNumber: body.teacherRegistrationNumber?.trim(),
+      teachingCouncilRegistration: body.teachingCouncilRegistration?.trim(),
+      teachingCertificateNumber: body.teachingCertificateNumber?.trim(),
+      teacherTrainingCollege: body.teacherTrainingCollege?.trim(),
+      universityQualification: body.universityQualification?.trim(),
+      primarySubject: body.primarySubject?.trim(),
+      secondarySubject: body.secondarySubject?.trim(),
+      employmentCategory: body.employmentCategory?.trim(),
+      contractType: body.contractType?.trim(),
+      yearsOfService: toNumberOrNull(body.yearsOfService),
       professionalLicenseNumber: body.professionalLicenseNumber?.trim(),
       specializations: body.specializations?.trim(),
       yearsExperience: toNumberOrNull(body.yearsExperience),

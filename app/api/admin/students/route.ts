@@ -13,11 +13,22 @@ interface CreateStudentBody {
   admissionDate?: string;
   email?: string;
   admissionNo?: string;
+  birthCertificateNumber?: string;
+  schoolLevel?: "Primary" | "Secondary";
+  formLevel?: string;
+  classStream?: string;
   gradeLevel?: string;
   sectionStream?: string;
   academicYear?: string;
   transferStatus?: string;
   previousSchool?: string;
+  previousSchoolAddress?: string;
+  grade7ExamCentreNumber?: string;
+  grade7CandidateNumber?: string;
+  grade7Results?: string;
+  zimsecIndexNumber?: string;
+  curriculumType?: string;
+  houseName?: string;
   boardingStatus?: string;
   transportMethod?: string;
   busRoute?: string;
@@ -27,6 +38,7 @@ interface CreateStudentBody {
   guardian1Name?: string;
   guardian1Relationship?: string;
   guardian1Phone?: string;
+  guardian1NationalIdNumber?: string;
   guardian1Email?: string;
   guardian1Occupation?: string;
   guardian1Address?: string;
@@ -36,6 +48,8 @@ interface CreateStudentBody {
   allergies?: string;
   medicalNotes?: string;
   knownConditions?: string;
+  immunisationRecord?: string;
+  medicalAidProvider?: string;
   medications?: string;
   bloodType?: string;
   specialNeeds?: string;
@@ -76,11 +90,22 @@ export async function POST(request: Request) {
   const admissionDate = body.admissionDate?.trim() ?? "";
   const email = body.email?.trim().toLowerCase() ?? "";
   const admissionNo = body.admissionNo?.trim() ?? "";
+  const birthCertificateNumber = body.birthCertificateNumber?.trim() ?? "";
+  const schoolLevel = body.schoolLevel === "Secondary" ? "Secondary" : "Primary";
+  const formLevel = body.formLevel?.trim() ?? "";
+  const classStream = body.classStream?.trim() ?? "";
   const gradeLevel = body.gradeLevel?.trim() ?? "";
   const sectionStream = body.sectionStream?.trim() ?? "";
   const academicYear = body.academicYear?.trim() ?? "";
   const transferStatus = body.transferStatus?.trim() ?? "";
   const previousSchool = body.previousSchool?.trim() ?? "";
+  const previousSchoolAddress = body.previousSchoolAddress?.trim() ?? "";
+  const grade7ExamCentreNumber = body.grade7ExamCentreNumber?.trim() ?? "";
+  const grade7CandidateNumber = body.grade7CandidateNumber?.trim() ?? "";
+  const grade7Results = body.grade7Results?.trim() ?? "";
+  const zimsecIndexNumber = body.zimsecIndexNumber?.trim() ?? "";
+  const curriculumType = body.curriculumType?.trim() ?? "";
+  const houseName = body.houseName?.trim() ?? "";
   const boardingStatus = body.boardingStatus?.trim() ?? "";
   const transportMethod = body.transportMethod?.trim() ?? "";
   const busRoute = body.busRoute?.trim() ?? "";
@@ -90,6 +115,7 @@ export async function POST(request: Request) {
   const guardian1Name = body.guardian1Name?.trim() ?? "";
   const guardian1Relationship = body.guardian1Relationship?.trim() ?? "";
   const guardian1Phone = body.guardian1Phone?.trim() ?? "";
+  const guardian1NationalIdNumber = body.guardian1NationalIdNumber?.trim() ?? "";
   const guardian1Email = body.guardian1Email?.trim() ?? "";
   const guardian1Occupation = body.guardian1Occupation?.trim() ?? "";
   const guardian1Address = body.guardian1Address?.trim() ?? "";
@@ -99,6 +125,8 @@ export async function POST(request: Request) {
   const allergies = body.allergies?.trim() ?? "";
   const medicalNotes = body.medicalNotes?.trim() ?? "";
   const knownConditions = body.knownConditions?.trim() ?? "";
+  const immunisationRecord = body.immunisationRecord?.trim() ?? "";
+  const medicalAidProvider = body.medicalAidProvider?.trim() ?? "";
   const medications = body.medications?.trim() ?? "";
   const bloodType = body.bloodType?.trim() ?? "";
   const specialNeeds = body.specialNeeds?.trim() ?? "";
@@ -113,6 +141,7 @@ export async function POST(request: Request) {
     !email ||
     !admissionNo ||
     !gradeLevel ||
+    !birthCertificateNumber ||
     !guardian1Name ||
     !guardian1Relationship ||
     !guardian1Phone
@@ -123,6 +152,13 @@ export async function POST(request: Request) {
         message:
           "First name, last name, DOB, gender, admission date, email, admission number, grade, and primary guardian fields are required.",
       },
+      { status: 400 },
+    );
+  }
+
+  if (schoolLevel === "Secondary" && !formLevel) {
+    return NextResponse.json(
+      { ok: false, message: "Form level is required for secondary students." },
       { status: 400 },
     );
   }
@@ -143,11 +179,22 @@ export async function POST(request: Request) {
       admissionDate,
       email,
       admissionNo,
+      birthCertificateNumber,
       gradeLevel,
+      schoolLevel,
+      formLevel,
+      classStream,
       sectionStream,
       academicYear,
       transferStatus,
       previousSchool,
+      previousSchoolAddress,
+      grade7ExamCentreNumber,
+      grade7CandidateNumber,
+      grade7Results,
+      zimsecIndexNumber,
+      curriculumType,
+      houseName,
       boardingStatus,
       transportMethod,
       busRoute,
@@ -157,6 +204,7 @@ export async function POST(request: Request) {
       guardian1Name,
       guardian1Relationship,
       guardian1Phone,
+      guardian1NationalIdNumber,
       guardian1Email,
       guardian1Occupation,
       guardian1Address,
@@ -166,6 +214,8 @@ export async function POST(request: Request) {
       allergies,
       medicalNotes,
       knownConditions,
+      immunisationRecord,
+      medicalAidProvider,
       medications,
       bloodType,
       specialNeeds,

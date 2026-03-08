@@ -1,4 +1,4 @@
-export type Role = "admin" | "teacher" | "student" | "parent" | "superadmin";
+export type Role = "admin" | "teacher" | "student" | "parent" | "superadmin" | "principal" | "headmaster";
 
 export interface AuthUser {
   id: number;
@@ -8,5 +8,8 @@ export interface AuthUser {
 }
 
 export function roleToDashboardPath(role: Role) {
-  return role === "superadmin" ? "/dashboard/super-admin" : `/dashboard/${role}`;
+  if (role === "superadmin") {
+    return "/dashboard/super-admin";
+  }
+  return `/dashboard/${role}`;
 }

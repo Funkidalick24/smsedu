@@ -11,6 +11,12 @@ SMSEdu is a role-based school management web app built with Next.js.
 - Forgot/reset password flow is available at `/forgot-password` and `/reset-password`.
 - Admin dashboard stats and classroom snapshot now load from DB-backed APIs.
 - SQLite schema/migration foundation added for users/roles, students, teachers, classes, terms, attendance, and sessions.
+- Zimbabwe-aligned schema expansion added for:
+  - Student registration: birth certificate number, Grade 7 exam details, ZIMSEC index, guardian national ID, curriculum type, and house assignment.
+  - Teacher records: teacher registration number, teaching council registration, certificate number, training college/university qualification, subject specialization, and employment category.
+  - Class setup: primary/secondary level, form level, stream letter, and curriculum type.
+  - Student document support and ZIMSEC exam entry tables.
+- Admin class module now supports class creation with section, academic year/term, class/assistant teacher, capacity, location, attendance settings, grading settings, notes, and subject-teacher assignments.
 - Role-aware dashboards for:
   - Admin
   - Teacher
@@ -19,6 +25,7 @@ SMSEdu is a role-based school management web app built with Next.js.
   - Super Admin
 - Dashboard layout includes auth-aware UI rendering and role routing.
 - Shared production-style UI components (`StatCard`, `Table`, `Sidebar`, `Topbar`) with consistent styling.
+- Student dashboard now reflects term-report style metrics (not GPA-centric tracking).
 
 ## Default development credentials
 
