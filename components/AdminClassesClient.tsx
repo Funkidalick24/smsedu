@@ -117,6 +117,7 @@ export default function AdminClassesClient({
   const [isSaving, setIsSaving] = useState(false);
   const [form, setForm] = useState<ClassFormState>(initialForm);
   const [formError, setFormError] = useState("");
+  const [showRequiredHighlights, setShowRequiredHighlights] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -138,6 +139,7 @@ export default function AdminClassesClient({
     setIsModalOpen(false);
     setForm(initialForm);
     setFormError("");
+    setShowRequiredHighlights(false);
   };
 
   useEffect(() => {
@@ -200,6 +202,7 @@ export default function AdminClassesClient({
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setFormError("");
+    setShowRequiredHighlights(true);
 
     const validationError = validateRequired();
     if (validationError) {
@@ -207,6 +210,7 @@ export default function AdminClassesClient({
       return;
     }
 
+    setShowRequiredHighlights(false);
     setIsSaving(true);
 
     const response = await fetch("/api/admin/classes", {
@@ -240,6 +244,13 @@ export default function AdminClassesClient({
     setIsSaving(false);
     closeModal();
   };
+
+  const requiredInputClass = (missing: boolean) =>
+    `w-full rounded-lg border px-3 py-2 ${
+      showRequiredHighlights && missing ? "border-red-500 bg-red-50" : "border-blue-200"
+    }`;
+
+  const hasSelectedSubject = form.subjects.some((subject) => subject.subjectId);
 
   return (
     <>
@@ -320,7 +331,8 @@ export default function AdminClassesClient({
                       <input
                         value={form.className}
                         onChange={(event) => setForm((prev) => ({ ...prev, className: event.target.value }))}
-                        className="w-full rounded-lg border border-blue-200 px-3 py-2"
+                        className={requiredInputClass(!form.className.trim())}
+                        required
                       />
                     </div>
                     <div>
@@ -328,7 +340,8 @@ export default function AdminClassesClient({
                     <input
                       value={form.sectionStream}
                       onChange={(event) => setForm((prev) => ({ ...prev, sectionStream: event.target.value }))}
-                      className="w-full rounded-lg border border-blue-200 px-3 py-2"
+                      className={requiredInputClass(!form.sectionStream.trim())}
+                      required
                     />
                     </div>
                     <div>
@@ -353,11 +366,12 @@ export default function AdminClassesClient({
                     </select>
                     </div>
                     <div>
-                      <label className="mb-1 block text-sm font-medium text-slate-700">Form Level</label>
+                      <label className="mb-1 block text-sm font-medium text-slate-700">Form Level * (Secondary only)</label>
                     <input
                       value={form.formLevel}
                       onChange={(event) => setForm((prev) => ({ ...prev, formLevel: event.target.value }))}
-                      className="w-full rounded-lg border border-blue-200 px-3 py-2"
+                      className={requiredInputClass(form.schoolLevel === "Secondary" && !form.formLevel.trim())}
+                      required={form.schoolLevel === "Secondary"}
                     />
                     </div>
                     <div>
@@ -365,7 +379,8 @@ export default function AdminClassesClient({
                     <input
                       value={form.gradeLevel}
                       onChange={(event) => setForm((prev) => ({ ...prev, gradeLevel: event.target.value }))}
-                      className="w-full rounded-lg border border-blue-200 px-3 py-2"
+                      className={requiredInputClass(!form.gradeLevel.trim())}
+                      required
                     />
                     </div>
                     <div>
@@ -373,7 +388,8 @@ export default function AdminClassesClient({
                     <input
                       value={form.academicYear}
                       onChange={(event) => setForm((prev) => ({ ...prev, academicYear: event.target.value }))}
-                      className="w-full rounded-lg border border-blue-200 px-3 py-2"
+                      className={requiredInputClass(!form.academicYear.trim())}
+                      required
                     />
                     </div>
                     <div>
@@ -381,7 +397,8 @@ export default function AdminClassesClient({
                     <input
                       value={form.term}
                       onChange={(event) => setForm((prev) => ({ ...prev, term: event.target.value }))}
-                      className="w-full rounded-lg border border-blue-200 px-3 py-2"
+                      className={requiredInputClass(!form.term.trim())}
+                      required
                     />
                     </div>
                     <div>
@@ -404,7 +421,8 @@ export default function AdminClassesClient({
                       max={120}
                       value={form.maxStudents}
                       onChange={(event) => setForm((prev) => ({ ...prev, maxStudents: event.target.value }))}
-                      className="w-full rounded-lg border border-blue-200 px-3 py-2"
+                      className={requiredInputClass(!form.maxStudents.trim())}
+                      required
                     />
                     </div>
                   </div>
@@ -470,9 +488,9 @@ export default function AdminClassesClient({
                               subjectCode: selected?.code ?? "",
                             });
                           }}
-                          className="rounded-lg border border-blue-200 px-3 py-2"
+                          className={`rounded-lg border px-3 py-2 ${showRequiredHighlights && !hasSelectedSubject ? "border-red-500 bg-red-50" : "border-blue-200"}`}
                         >
-                          <option value="">Subject</option>
+                          <option value="">Subject *</option>
                           {subjects.map((subject) => (
                             <option key={subject.id} value={subject.id}>
                               {subject.name}

@@ -44,6 +44,7 @@ export default function SuperAdminSchoolsClient() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [credentials, setCredentials] = useState<{ email: string; password: string } | null>(null);
+  const [showRequiredHighlights, setShowRequiredHighlights] = useState(false);
   const [form, setForm] = useState({
     schoolName: "",
     schoolCode: "",
@@ -83,6 +84,12 @@ export default function SuperAdminSchoolsClient() {
     setError("");
     setSuccess("");
     setCredentials(null);
+    setShowRequiredHighlights(true);
+
+    if (!form.schoolName.trim() || !form.schoolCode.trim() || !form.leaderFullName.trim() || !form.leaderEmail.trim()) {
+      setError("Please fill in all required fields.");
+      return;
+    }
 
     const response = await fetch("/api/super-admin/schools", {
       method: "POST",
@@ -97,6 +104,7 @@ export default function SuperAdminSchoolsClient() {
 
     setSchools(payload.schools ?? []);
     setSuccess("School and leader account created successfully.");
+    setShowRequiredHighlights(false);
     if (payload.leaderEmail && payload.temporaryPassword) {
       setCredentials({ email: payload.leaderEmail, password: payload.temporaryPassword });
     }
@@ -115,6 +123,11 @@ export default function SuperAdminSchoolsClient() {
     }));
   };
 
+  const requiredClass = (missing: boolean) =>
+    `w-full rounded border px-3 py-2 text-sm ${
+      showRequiredHighlights && missing ? "border-red-500 bg-red-50" : "border-blue-200"
+    }`;
+
   return (
     <div className="space-y-6">
       <section className="rounded-xl border border-blue-100 bg-white p-5 shadow-sm">
@@ -124,18 +137,18 @@ export default function SuperAdminSchoolsClient() {
         </p>
         <form onSubmit={handleSubmit} className="grid gap-3 md:grid-cols-2">
           <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700">School name</label>
+            <label className="mb-1 block text-sm font-medium text-slate-700">School name *</label>
             <input
-              className="w-full rounded border border-blue-200 px-3 py-2 text-sm"
+              className={requiredClass(!form.schoolName.trim())}
               value={form.schoolName}
               onChange={(event) => setForm((prev) => ({ ...prev, schoolName: event.target.value }))}
               required
             />
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700">School code</label>
+            <label className="mb-1 block text-sm font-medium text-slate-700">School code *</label>
             <input
-              className="w-full rounded border border-blue-200 px-3 py-2 text-sm"
+              className={requiredClass(!form.schoolCode.trim())}
               value={form.schoolCode}
               onChange={(event) => setForm((prev) => ({ ...prev, schoolCode: event.target.value }))}
               required
@@ -189,18 +202,18 @@ export default function SuperAdminSchoolsClient() {
             </select>
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700">Leader full name</label>
+            <label className="mb-1 block text-sm font-medium text-slate-700">Leader full name *</label>
             <input
-              className="w-full rounded border border-blue-200 px-3 py-2 text-sm"
+              className={requiredClass(!form.leaderFullName.trim())}
               value={form.leaderFullName}
               onChange={(event) => setForm((prev) => ({ ...prev, leaderFullName: event.target.value }))}
               required
             />
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700">Leader email</label>
+            <label className="mb-1 block text-sm font-medium text-slate-700">Leader email *</label>
             <input
-              className="w-full rounded border border-blue-200 px-3 py-2 text-sm"
+              className={requiredClass(!form.leaderEmail.trim())}
               value={form.leaderEmail}
               onChange={(event) => setForm((prev) => ({ ...prev, leaderEmail: event.target.value }))}
               required

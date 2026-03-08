@@ -317,6 +317,7 @@ export default function AdminTeachersClient({
   const [activeTab, setActiveTab] = useState<TeacherFormTab>("personal");
   const [form, setForm] = useState<TeacherFormState>(initialForm);
   const [formError, setFormError] = useState("");
+  const [showRequiredHighlights, setShowRequiredHighlights] = useState(false);
   const [editingTeacherId, setEditingTeacherId] = useState<number | null>(null);
 
   const [viewTeacher, setViewTeacher] = useState<TeacherDetail | null>(null);
@@ -370,6 +371,7 @@ export default function AdminTeachersClient({
     setForm(initialForm);
     setFormError("");
     setActiveTab("personal");
+    setShowRequiredHighlights(false);
     setIsFormModalOpen(true);
   };
 
@@ -418,6 +420,7 @@ export default function AdminTeachersClient({
     setForm(initialForm);
     setFormError("");
     setActiveTab("personal");
+    setShowRequiredHighlights(false);
   };
 
   useEffect(() => {
@@ -431,6 +434,7 @@ export default function AdminTeachersClient({
         setForm(initialForm);
         setFormError("");
         setActiveTab("personal");
+        setShowRequiredHighlights(false);
       }
     };
     window.addEventListener("keydown", onEscape);
@@ -456,12 +460,14 @@ export default function AdminTeachersClient({
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setFormError("");
+    setShowRequiredHighlights(true);
     const validationError = validateRequired();
     if (validationError) {
       setFormError(validationError);
       return;
     }
 
+    setShowRequiredHighlights(false);
     setIsSaving(true);
     const payload = {
       ...form,
@@ -522,6 +528,11 @@ export default function AdminTeachersClient({
     setUploadFile(null);
     setIsUploading(false);
   };
+
+  const requiredInputClass = (missing: boolean) =>
+    `w-full rounded-lg border px-3 py-2 ${
+      showRequiredHighlights && missing ? "border-red-500 bg-red-50" : "border-blue-200"
+    }`;
 
   return (
     <>
@@ -627,9 +638,9 @@ export default function AdminTeachersClient({
               <div className="max-h-[60vh] overflow-y-auto p-6">
                 {activeTab === "personal" ? (
                   <section className="grid gap-4 md:grid-cols-2">
-                    <div><FieldLabel>First Name *</FieldLabel><input value={form.firstName} onChange={(e) => setForm((p) => ({ ...p, firstName: e.target.value }))} className="w-full rounded-lg border border-blue-200 px-3 py-2" /></div>
+                    <div><FieldLabel>First Name *</FieldLabel><input value={form.firstName} onChange={(e) => setForm((p) => ({ ...p, firstName: e.target.value }))} className={requiredInputClass(!form.firstName.trim())} required /></div>
                     <div><FieldLabel>Middle Name</FieldLabel><input value={form.middleName} onChange={(e) => setForm((p) => ({ ...p, middleName: e.target.value }))} className="w-full rounded-lg border border-blue-200 px-3 py-2" /></div>
-                    <div><FieldLabel>Last Name *</FieldLabel><input value={form.lastName} onChange={(e) => setForm((p) => ({ ...p, lastName: e.target.value }))} className="w-full rounded-lg border border-blue-200 px-3 py-2" /></div>
+                    <div><FieldLabel>Last Name *</FieldLabel><input value={form.lastName} onChange={(e) => setForm((p) => ({ ...p, lastName: e.target.value }))} className={requiredInputClass(!form.lastName.trim())} required /></div>
                     <div><FieldLabel>Date of Birth</FieldLabel><input type="date" value={form.dateOfBirth} onChange={(e) => setForm((p) => ({ ...p, dateOfBirth: e.target.value }))} className="w-full rounded-lg border border-blue-200 px-3 py-2" /></div>
                     <div><FieldLabel>Gender</FieldLabel><input value={form.gender} onChange={(e) => setForm((p) => ({ ...p, gender: e.target.value }))} className="w-full rounded-lg border border-blue-200 px-3 py-2" /></div>
                     <div><FieldLabel>Nationality</FieldLabel><input value={form.nationality} onChange={(e) => setForm((p) => ({ ...p, nationality: e.target.value }))} className="w-full rounded-lg border border-blue-200 px-3 py-2" /></div>
@@ -638,8 +649,8 @@ export default function AdminTeachersClient({
 
                 {activeTab === "contact" ? (
                   <section className="grid gap-4 md:grid-cols-2">
-                    <div><FieldLabel>Phone Number *</FieldLabel><input value={form.phoneNumber} onChange={(e) => setForm((p) => ({ ...p, phoneNumber: e.target.value }))} className="w-full rounded-lg border border-blue-200 px-3 py-2" /></div>
-                    <div><FieldLabel>Email Address *</FieldLabel><input type="email" value={form.email} onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))} className="w-full rounded-lg border border-blue-200 px-3 py-2" /></div>
+                    <div><FieldLabel>Phone Number *</FieldLabel><input value={form.phoneNumber} onChange={(e) => setForm((p) => ({ ...p, phoneNumber: e.target.value }))} className={requiredInputClass(!form.phoneNumber.trim())} required /></div>
+                    <div><FieldLabel>Email Address *</FieldLabel><input type="email" value={form.email} onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))} className={requiredInputClass(!form.email.trim())} required /></div>
                     <div><FieldLabel>Home Address</FieldLabel><input value={form.addressLine} onChange={(e) => setForm((p) => ({ ...p, addressLine: e.target.value }))} className="w-full rounded-lg border border-blue-200 px-3 py-2" /></div>
                     <div><FieldLabel>City / Town</FieldLabel><input value={form.city} onChange={(e) => setForm((p) => ({ ...p, city: e.target.value }))} className="w-full rounded-lg border border-blue-200 px-3 py-2" /></div>
                   </section>
@@ -647,9 +658,9 @@ export default function AdminTeachersClient({
 
                 {activeTab === "employment" ? (
                   <section className="grid gap-4 md:grid-cols-2">
-                    <div><FieldLabel>Employee ID *</FieldLabel><input value={form.employeeNo} onChange={(e) => setForm((p) => ({ ...p, employeeNo: e.target.value }))} className="w-full rounded-lg border border-blue-200 px-3 py-2" /></div>
-                    <div><FieldLabel>Employment Date</FieldLabel><input type="date" value={form.employmentDate} onChange={(e) => setForm((p) => ({ ...p, employmentDate: e.target.value }))} className="w-full rounded-lg border border-blue-200 px-3 py-2" /></div>
-                    <div><FieldLabel>Department *</FieldLabel><input value={form.department} onChange={(e) => setForm((p) => ({ ...p, department: e.target.value }))} className="w-full rounded-lg border border-blue-200 px-3 py-2" /></div>
+                    <div><FieldLabel>Employee ID *</FieldLabel><input value={form.employeeNo} onChange={(e) => setForm((p) => ({ ...p, employeeNo: e.target.value }))} className={requiredInputClass(!form.employeeNo.trim())} required /></div>
+                    <div><FieldLabel>Employment Date *</FieldLabel><input type="date" value={form.employmentDate} onChange={(e) => setForm((p) => ({ ...p, employmentDate: e.target.value }))} className={requiredInputClass(!form.employmentDate.trim())} required /></div>
+                    <div><FieldLabel>Department *</FieldLabel><input value={form.department} onChange={(e) => setForm((p) => ({ ...p, department: e.target.value }))} className={requiredInputClass(!form.department.trim())} required /></div>
                     <div><FieldLabel>Status</FieldLabel><input value={form.status} onChange={(e) => setForm((p) => ({ ...p, status: e.target.value }))} className="w-full rounded-lg border border-blue-200 px-3 py-2" /></div>
                     <div><FieldLabel>Employment Category</FieldLabel><input value={form.employmentCategory} onChange={(e) => setForm((p) => ({ ...p, employmentCategory: e.target.value }))} className="w-full rounded-lg border border-blue-200 px-3 py-2" /></div>
                     <div><FieldLabel>Contract Type</FieldLabel><input value={form.contractType} onChange={(e) => setForm((p) => ({ ...p, contractType: e.target.value }))} className="w-full rounded-lg border border-blue-200 px-3 py-2" /></div>
