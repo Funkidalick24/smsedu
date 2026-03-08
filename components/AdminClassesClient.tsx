@@ -315,24 +315,32 @@ export default function AdminClassesClient({
                 <section className="mb-6">
                   <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-700">Class Details</h3>
                   <div className="grid gap-4 md:grid-cols-3">
-                    <input
-                      value={form.className}
-                      onChange={(event) => setForm((prev) => ({ ...prev, className: event.target.value }))}
-                      placeholder="Class Name (e.g., Grade 7) *"
-                      className="w-full rounded-lg border border-blue-200 px-3 py-2"
-                    />
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-slate-700">Class Name *</label>
+                      <input
+                        value={form.className}
+                        onChange={(event) => setForm((prev) => ({ ...prev, className: event.target.value }))}
+                        className="w-full rounded-lg border border-blue-200 px-3 py-2"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-slate-700">Section / Stream *</label>
                     <input
                       value={form.sectionStream}
                       onChange={(event) => setForm((prev) => ({ ...prev, sectionStream: event.target.value }))}
-                      placeholder="Section / Stream *"
                       className="w-full rounded-lg border border-blue-200 px-3 py-2"
                     />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-slate-700">Stream Letter</label>
                     <input
                       value={form.streamLetter}
                       onChange={(event) => setForm((prev) => ({ ...prev, streamLetter: event.target.value }))}
-                      placeholder="Stream Letter (A/B/C)"
                       className="w-full rounded-lg border border-blue-200 px-3 py-2"
                     />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-slate-700">School Level</label>
                     <select
                       value={form.schoolLevel}
                       onChange={(event) =>
@@ -343,30 +351,41 @@ export default function AdminClassesClient({
                       <option value="Primary">Primary School</option>
                       <option value="Secondary">Secondary School</option>
                     </select>
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-slate-700">Form Level</label>
                     <input
                       value={form.formLevel}
                       onChange={(event) => setForm((prev) => ({ ...prev, formLevel: event.target.value }))}
-                      placeholder="Form Level (Form 1-6)"
                       className="w-full rounded-lg border border-blue-200 px-3 py-2"
                     />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-slate-700">Grade Level *</label>
                     <input
                       value={form.gradeLevel}
                       onChange={(event) => setForm((prev) => ({ ...prev, gradeLevel: event.target.value }))}
-                      placeholder="Grade Level *"
                       className="w-full rounded-lg border border-blue-200 px-3 py-2"
                     />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-slate-700">Academic Year *</label>
                     <input
                       value={form.academicYear}
                       onChange={(event) => setForm((prev) => ({ ...prev, academicYear: event.target.value }))}
-                      placeholder="Academic Year *"
                       className="w-full rounded-lg border border-blue-200 px-3 py-2"
                     />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-slate-700">Term *</label>
                     <input
                       value={form.term}
                       onChange={(event) => setForm((prev) => ({ ...prev, term: event.target.value }))}
-                      placeholder="Term *"
                       className="w-full rounded-lg border border-blue-200 px-3 py-2"
                     />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-slate-700">Curriculum Type</label>
                     <select
                       value={form.curriculumType}
                       onChange={(event) => setForm((prev) => ({ ...prev, curriculumType: event.target.value }))}
@@ -376,21 +395,26 @@ export default function AdminClassesClient({
                       <option value="Cambridge">Cambridge</option>
                       <option value="International Baccalaureate">International Baccalaureate</option>
                     </select>
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-slate-700">Maximum Students *</label>
                     <input
                       type="number"
                       min={1}
                       max={120}
                       value={form.maxStudents}
                       onChange={(event) => setForm((prev) => ({ ...prev, maxStudents: event.target.value }))}
-                      placeholder="Maximum Students *"
                       className="w-full rounded-lg border border-blue-200 px-3 py-2"
                     />
+                    </div>
                   </div>
                 </section>
 
                 <section className="mb-6">
                   <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-700">Administration</h3>
                   <div className="grid gap-4 md:grid-cols-3">
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-slate-700">Class Teacher</label>
                     <select
                       value={form.classTeacherId}
                       onChange={(event) => setForm((prev) => ({ ...prev, classTeacherId: event.target.value }))}
@@ -403,6 +427,9 @@ export default function AdminClassesClient({
                         </option>
                       ))}
                     </select>
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-slate-700">Assistant Teacher</label>
                     <select
                       value={form.assistantTeacherId}
                       onChange={(event) => setForm((prev) => ({ ...prev, assistantTeacherId: event.target.value }))}
@@ -415,12 +442,15 @@ export default function AdminClassesClient({
                         </option>
                       ))}
                     </select>
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-slate-700">Department</label>
                     <input
                       value={form.department}
                       onChange={(event) => setForm((prev) => ({ ...prev, department: event.target.value }))}
-                      placeholder="Department"
                       className="w-full rounded-lg border border-blue-200 px-3 py-2"
                     />
+                    </div>
                   </div>
                 </section>
 
@@ -429,6 +459,8 @@ export default function AdminClassesClient({
                   <div className="space-y-3">
                     {form.subjects.map((subjectRow, index) => (
                       <div key={`subject-row-${index}`} className="grid gap-3 rounded-lg border border-blue-100 p-3 md:grid-cols-4">
+                        <div>
+                          <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-600">Subject</label>
                         <select
                           value={subjectRow.subjectId}
                           onChange={(event) => {
@@ -447,6 +479,9 @@ export default function AdminClassesClient({
                             </option>
                           ))}
                         </select>
+                        </div>
+                        <div>
+                          <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-600">Assigned Teacher</label>
                         <select
                           value={subjectRow.teacherId}
                           onChange={(event) => updateSubjectRow(index, { teacherId: event.target.value })}
@@ -459,12 +494,15 @@ export default function AdminClassesClient({
                             </option>
                           ))}
                         </select>
+                        </div>
+                        <div>
+                          <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-600">Subject Code</label>
                         <input
                           value={subjectRow.subjectCode}
                           onChange={(event) => updateSubjectRow(index, { subjectCode: event.target.value })}
-                          placeholder="Subject Code"
                           className="rounded-lg border border-blue-200 px-3 py-2"
                         />
+                        </div>
                         <button
                           type="button"
                           className="rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50"
@@ -488,24 +526,32 @@ export default function AdminClassesClient({
                 <section className="mb-6">
                   <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-700">Location & Attendance</h3>
                   <div className="grid gap-4 md:grid-cols-3">
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-slate-700">Building</label>
                     <input
                       value={form.building}
                       onChange={(event) => setForm((prev) => ({ ...prev, building: event.target.value }))}
-                      placeholder="Building"
                       className="w-full rounded-lg border border-blue-200 px-3 py-2"
                     />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-slate-700">Room Number</label>
                     <input
                       value={form.roomNumber}
                       onChange={(event) => setForm((prev) => ({ ...prev, roomNumber: event.target.value }))}
-                      placeholder="Room Number"
                       className="w-full rounded-lg border border-blue-200 px-3 py-2"
                     />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-slate-700">Floor</label>
                     <input
                       value={form.floor}
                       onChange={(event) => setForm((prev) => ({ ...prev, floor: event.target.value }))}
-                      placeholder="Floor"
                       className="w-full rounded-lg border border-blue-200 px-3 py-2"
                     />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-slate-700">Attendance Mode</label>
                     <select
                       value={form.attendanceMode}
                       onChange={(event) =>
@@ -516,6 +562,9 @@ export default function AdminClassesClient({
                       <option value="daily">Attendance: Daily</option>
                       <option value="period">Attendance: Per Period</option>
                     </select>
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-slate-700">Attendance Teacher</label>
                     <select
                       value={form.attendanceTeacherId}
                       onChange={(event) => setForm((prev) => ({ ...prev, attendanceTeacherId: event.target.value }))}
@@ -528,6 +577,7 @@ export default function AdminClassesClient({
                         </option>
                       ))}
                     </select>
+                    </div>
                     <label className="flex items-center gap-2 rounded-lg border border-blue-100 px-3 py-2 text-sm text-slate-700">
                       <input
                         type="checkbox"
@@ -542,34 +592,42 @@ export default function AdminClassesClient({
                 <section>
                   <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-700">Academic Settings</h3>
                   <div className="grid gap-4 md:grid-cols-3">
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-slate-700">Grading System</label>
                     <input
                       value={form.gradingSystem}
                       onChange={(event) => setForm((prev) => ({ ...prev, gradingSystem: event.target.value }))}
-                      placeholder="Grading System"
                       className="w-full rounded-lg border border-blue-200 px-3 py-2"
                     />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-slate-700">Assessment Types</label>
                     <input
                       value={form.assessmentTypes}
                       onChange={(event) => setForm((prev) => ({ ...prev, assessmentTypes: event.target.value }))}
-                      placeholder="Assessment Types"
                       className="w-full rounded-lg border border-blue-200 px-3 py-2"
                     />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-slate-700">Pass Mark</label>
                     <input
                       type="number"
                       min={0}
                       max={100}
                       value={form.passingScore}
                       onChange={(event) => setForm((prev) => ({ ...prev, passingScore: event.target.value }))}
-                      placeholder="Pass Mark"
                       className="w-full rounded-lg border border-blue-200 px-3 py-2"
                     />
+                    </div>
+                    <div className="md:col-span-3">
+                      <label className="mb-1 block text-sm font-medium text-slate-700">Class Notes</label>
                     <textarea
                       value={form.notes}
                       onChange={(event) => setForm((prev) => ({ ...prev, notes: event.target.value }))}
-                      placeholder="Class Notes"
-                      className="w-full rounded-lg border border-blue-200 px-3 py-2 md:col-span-3"
+                      className="w-full rounded-lg border border-blue-200 px-3 py-2"
                       rows={3}
                     />
+                    </div>
                   </div>
                 </section>
               </div>

@@ -123,75 +123,97 @@ export default function SuperAdminSchoolsClient() {
           Create a school and immediately provision a principal or headmaster account that can log in.
         </p>
         <form onSubmit={handleSubmit} className="grid gap-3 md:grid-cols-2">
-          <input
-            className="rounded border border-blue-200 px-3 py-2 text-sm"
-            placeholder="School name"
-            value={form.schoolName}
-            onChange={(event) => setForm((prev) => ({ ...prev, schoolName: event.target.value }))}
-            required
-          />
-          <input
-            className="rounded border border-blue-200 px-3 py-2 text-sm"
-            placeholder="School code (e.g. HARARE-01)"
-            value={form.schoolCode}
-            onChange={(event) => setForm((prev) => ({ ...prev, schoolCode: event.target.value }))}
-            required
-          />
-          <select
-            className="rounded border border-blue-200 px-3 py-2 text-sm"
-            value={form.level}
-            onChange={(event) => setForm((prev) => ({ ...prev, level: event.target.value }))}
-          >
-            <option value="Primary">Primary</option>
-            <option value="Secondary">Secondary</option>
-            <option value="Combined">Combined</option>
-          </select>
-          <input
-            className="rounded border border-blue-200 px-3 py-2 text-sm"
-            placeholder="District"
-            value={form.district}
-            onChange={(event) => setForm((prev) => ({ ...prev, district: event.target.value }))}
-          />
-          <input
-            className="rounded border border-blue-200 px-3 py-2 text-sm"
-            placeholder="Province"
-            value={form.province}
-            onChange={(event) => setForm((prev) => ({ ...prev, province: event.target.value }))}
-          />
-          <input
-            className="rounded border border-blue-200 px-3 py-2 text-sm"
-            placeholder="School email"
-            value={form.schoolEmail}
-            onChange={(event) => setForm((prev) => ({ ...prev, schoolEmail: event.target.value }))}
-          />
-          <select
-            className="rounded border border-blue-200 px-3 py-2 text-sm"
-            value={form.leaderTitle}
-            onChange={(event) => setForm((prev) => ({ ...prev, leaderTitle: event.target.value }))}
-          >
-            <option value="principal">Principal</option>
-            <option value="headmaster">Headmaster</option>
-          </select>
-          <input
-            className="rounded border border-blue-200 px-3 py-2 text-sm"
-            placeholder="Leader full name"
-            value={form.leaderFullName}
-            onChange={(event) => setForm((prev) => ({ ...prev, leaderFullName: event.target.value }))}
-            required
-          />
-          <input
-            className="rounded border border-blue-200 px-3 py-2 text-sm"
-            placeholder="Leader email"
-            value={form.leaderEmail}
-            onChange={(event) => setForm((prev) => ({ ...prev, leaderEmail: event.target.value }))}
-            required
-          />
-          <input
-            className="rounded border border-blue-200 px-3 py-2 text-sm"
-            placeholder="Leader phone (optional)"
-            value={form.leaderPhone}
-            onChange={(event) => setForm((prev) => ({ ...prev, leaderPhone: event.target.value }))}
-          />
+          <div>
+            <label className="mb-1 block text-sm font-medium text-slate-700">School name</label>
+            <input
+              className="w-full rounded border border-blue-200 px-3 py-2 text-sm"
+              value={form.schoolName}
+              onChange={(event) => setForm((prev) => ({ ...prev, schoolName: event.target.value }))}
+              required
+            />
+          </div>
+          <div>
+            <label className="mb-1 block text-sm font-medium text-slate-700">School code</label>
+            <input
+              className="w-full rounded border border-blue-200 px-3 py-2 text-sm"
+              value={form.schoolCode}
+              onChange={(event) => setForm((prev) => ({ ...prev, schoolCode: event.target.value }))}
+              required
+            />
+          </div>
+          <div>
+            <label className="mb-1 block text-sm font-medium text-slate-700">School level</label>
+            <select
+              className="w-full rounded border border-blue-200 px-3 py-2 text-sm"
+              value={form.level}
+              onChange={(event) => setForm((prev) => ({ ...prev, level: event.target.value }))}
+            >
+              <option value="Primary">Primary</option>
+              <option value="Secondary">Secondary</option>
+              <option value="Combined">Combined</option>
+            </select>
+          </div>
+          <div>
+            <label className="mb-1 block text-sm font-medium text-slate-700">District</label>
+            <input
+              className="w-full rounded border border-blue-200 px-3 py-2 text-sm"
+              value={form.district}
+              onChange={(event) => setForm((prev) => ({ ...prev, district: event.target.value }))}
+            />
+          </div>
+          <div>
+            <label className="mb-1 block text-sm font-medium text-slate-700">Province</label>
+            <input
+              className="w-full rounded border border-blue-200 px-3 py-2 text-sm"
+              value={form.province}
+              onChange={(event) => setForm((prev) => ({ ...prev, province: event.target.value }))}
+            />
+          </div>
+          <div>
+            <label className="mb-1 block text-sm font-medium text-slate-700">School email</label>
+            <input
+              className="w-full rounded border border-blue-200 px-3 py-2 text-sm"
+              value={form.schoolEmail}
+              onChange={(event) => setForm((prev) => ({ ...prev, schoolEmail: event.target.value }))}
+            />
+          </div>
+          <div>
+            <label className="mb-1 block text-sm font-medium text-slate-700">Leader role</label>
+            <select
+              className="w-full rounded border border-blue-200 px-3 py-2 text-sm"
+              value={form.leaderTitle}
+              onChange={(event) => setForm((prev) => ({ ...prev, leaderTitle: event.target.value }))}
+            >
+              <option value="principal">Principal</option>
+              <option value="headmaster">Headmaster</option>
+            </select>
+          </div>
+          <div>
+            <label className="mb-1 block text-sm font-medium text-slate-700">Leader full name</label>
+            <input
+              className="w-full rounded border border-blue-200 px-3 py-2 text-sm"
+              value={form.leaderFullName}
+              onChange={(event) => setForm((prev) => ({ ...prev, leaderFullName: event.target.value }))}
+              required
+            />
+          </div>
+          <div>
+            <label className="mb-1 block text-sm font-medium text-slate-700">Leader email</label>
+            <input
+              className="w-full rounded border border-blue-200 px-3 py-2 text-sm"
+              value={form.leaderEmail}
+              onChange={(event) => setForm((prev) => ({ ...prev, leaderEmail: event.target.value }))}
+              required
+            />
+          </div>
+          <div>
+            <label className="mb-1 block text-sm font-medium text-slate-700">Leader phone (optional)</label>
+            <input
+              className="w-full rounded border border-blue-200 px-3 py-2 text-sm"
+              value={form.leaderPhone}
+              onChange={(event) => setForm((prev) => ({ ...prev, leaderPhone: event.target.value }))}
+            />
+          </div>
           <button
             className="rounded px-4 py-2 text-sm font-medium text-white md:col-span-2"
             style={{ backgroundColor: "var(--color-primary)" }}
