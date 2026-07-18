@@ -17,6 +17,7 @@ interface LoginResult {
 
 interface AuthContextType {
   user: AuthUser | null;
+  schoolId: number | null;
   isHydrating: boolean;
   login: (email: string, password: string) => Promise<LoginResult>;
   logout: () => Promise<void>;
@@ -62,7 +63,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const value = useMemo(
-    () => ({ user, isHydrating, login, logout }),
+    () => ({ user, schoolId: user?.schoolId ?? null, isHydrating, login, logout }),
     [user, isHydrating],
   );
 

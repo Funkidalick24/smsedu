@@ -80,7 +80,10 @@ export default function StudentHomeworkClient() {
   };
 
   useEffect(() => {
-    void loadHomework(statusFilter, subjectFilter);
+    const timer = window.setTimeout(() => {
+      void loadHomework(statusFilter, subjectFilter);
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, [statusFilter, subjectFilter]);
 
   const subjectOptions = useMemo(() => {

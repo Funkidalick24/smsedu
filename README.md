@@ -17,6 +17,8 @@ SMSEdu is a role-based school management web app built with Next.js.
   - Class setup: primary/secondary level, form level, stream letter, and curriculum type.
   - Student document support and ZIMSEC exam entry tables.
 - Admin class module now supports class creation with section, academic year/term, class/assistant teacher, capacity, location, attendance settings, grading settings, notes, and subject-teacher assignments.
+- Authentication sessions now include a seeded `schoolId` for the current user, and the client auth context exposes that tenant ID for multi-tenant UI/API follow-up work.
+- Teacher, parent, and super-admin secondary navigation pages now render DB-backed operational tables instead of placeholder-only screens.
 - Role-aware dashboards for:
   - Admin
   - Teacher

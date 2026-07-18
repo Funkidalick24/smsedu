@@ -1,7 +1,7 @@
 # Parent Dashboard Production Backlog
 
 ## Epic 1: Parent Data Integration (P0)
-- Replace static parent cards and child overview table with API-backed family data.
+- [x] Replace child overview placeholders with DB-backed linked learner and attendance summary tables. Dedicated parent-child link enforcement remains pending.
 - Add endpoints for linked children, attendance trends, performance summaries, and school notices.
 - Persist message read/unread status and parent acknowledgements.
 - Done when: parent dashboard is driven by real linked-student data.
@@ -14,9 +14,9 @@
 - Done when: parents can monitor child progress and complete standard communication tasks.
 
 ## Epic 3: Parent Navigation and UX (P1)
-- Convert sidebar items (`Children`, `Attendance`, `Messages`) into working pages.
+- [x] Convert sidebar items (`Children`, `Attendance`, `Messages`) into working DB-backed pages.
 - Add child switcher for multi-child households with persisted selection.
-- Add loading, empty, and error states for parent modules.
+- [x] Add empty states for parent child/message modules. Loading/error states remain pending for future client-side interactions.
 - Add notification indicators for urgent school or teacher messages.
 - Done when: parent users can navigate and act across all core modules smoothly.
 

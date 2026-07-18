@@ -65,6 +65,7 @@ export async function loginUser(
     name: user.full_name,
     role: user.role,
     email: user.email,
+    schoolId: user.school_id,
   };
   const token = randomBytes(48).toString("hex");
   const expiresAt = addHours(new Date(), SESSION_HOURS).toISOString();
@@ -114,6 +115,7 @@ export async function getAuthenticatedUser() {
     name: session.full_name,
     email: session.email,
     role: session.role,
+    schoolId: session.school_id,
   } satisfies AuthUser;
 }
 
