@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import DashboardLayout from "./DashboardLayout";
 import Table from "./Table";
 import { superAdminChecks } from "@/lib/dashboardData";
@@ -11,9 +11,6 @@ export default function SuperAdminDashboardClient() {
   const [color, setColor] = useState(primaryColor);
   const [message, setMessage] = useState("");
 
-  useEffect(() => {
-    setColor(primaryColor);
-  }, [primaryColor]);
 
   const updateTheme = () => {
     setPrimaryColor(color);
@@ -46,7 +43,10 @@ export default function SuperAdminDashboardClient() {
             Apply Theme
           </button>
           <button
-            onClick={resetPrimaryColor}
+            onClick={() => {
+              resetPrimaryColor();
+              setColor("#1d4ed8");
+            }}
             className="rounded-lg border px-4 py-2 text-sm"
             style={{ borderColor: "var(--color-border)", color: "var(--color-primary-strong)" }}
           >

@@ -11,6 +11,7 @@ interface DbUserRow {
   is_active: number;
   failed_attempts: number;
   locked_until: string | null;
+  school_id: number | null;
 }
 
 export interface SessionPayload {
@@ -29,7 +30,7 @@ export function findUserByEmail(email: string) {
   return db
     .prepare(
       `
-      SELECT u.id, u.email, u.full_name, u.password_hash, r.name as role, u.is_active, u.failed_attempts, u.locked_until
+      SELECT u.id, u.email, u.full_name, u.password_hash, r.name as role, u.is_active, u.failed_attempts, u.locked_until, u.school_id
       FROM users u
       JOIN roles r ON r.id = u.role_id
       WHERE lower(u.email) = lower(?)
@@ -73,7 +74,7 @@ export function findSession(token: string) {
   return db
     .prepare(
       `
-      SELECT s.id, s.expires_at, u.id as user_id, u.email, u.full_name, r.name as role
+      SELECT s.id, s.expires_at, u.id as user_id, u.email, u.full_name, u.school_id, r.name as role
       FROM sessions s
       JOIN users u ON u.id = s.user_id
       JOIN roles r ON r.id = u.role_id
@@ -88,6 +89,7 @@ export function findSession(token: string) {
         email: string;
         full_name: string;
         role: Role;
+        school_id: number | null;
       }
     | undefined;
 }
@@ -155,13 +157,13 @@ export function getAuthUserById(userId: number) {
   const row = db
     .prepare(
       `
-      SELECT u.id, u.email, u.full_name, r.name as role
+      SELECT u.id, u.email, u.full_name, u.school_id, r.name as role
       FROM users u
       JOIN roles r ON r.id = u.role_id
       WHERE u.id = ?
     `,
     )
-    .get(userId) as { id: number; email: string; full_name: string; role: Role } | undefined;
+    .get(userId) as { id: number; email: string; full_name: string; school_id: number | null; role: Role } | undefined;
 
   if (!row) {
     return null;
@@ -172,5 +174,6 @@ export function getAuthUserById(userId: number) {
     email: row.email,
     name: row.full_name,
     role: row.role,
+    schoolId: row.school_id,
   } satisfies AuthUser;
 }

@@ -1,7 +1,7 @@
 # Teacher Dashboard Production Backlog
 
 ## Epic 1: Data and API Integration (P0)
-- Replace static teacher stats and task lists with API-backed data.
+- [x] Replace static teacher module placeholders with DB-backed assigned class, assignment, and grade tables.
 - Add endpoints for teacher timetable, class load, pending grading, and attendance summaries.
 - Persist assignment/task state changes to database.
 - Done when: dashboard cards and tables load from live teacher data, not hardcoded arrays.
@@ -14,9 +14,9 @@
 - Done when: a teacher can complete daily teaching operations from dashboard-linked pages.
 
 ## Epic 3: Teacher Navigation and UX (P1)
-- Convert sidebar items (`My Classes`, `Assignments`, `Grades`) into route-linked pages.
+- [x] Convert sidebar items (`My Classes`, `Assignments`, `Grades`) into route-linked pages with data-backed summary tables.
 - Add filtering/search for classes, assignments, and student records.
-- Add loading, empty, and error states to all teacher views.
+- [x] Add empty states to teacher class, assignment, and grade views. Loading/error states remain pending for future interactive client flows.
 - Done when: all teacher navigation paths are actionable and support real task execution.
 
 ## Epic 4: Validation and Permissions (P1)

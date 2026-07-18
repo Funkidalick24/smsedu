@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTheme } from "@/context/ThemeContext";
 
 const PRESETS = ["#1d4ed8", "#0f766e", "#be123c", "#7c3aed", "#b45309"];
@@ -10,9 +10,6 @@ export default function SuperAdminThemeSettingsClient() {
   const [draftColor, setDraftColor] = useState(primaryColor);
   const [saved, setSaved] = useState("");
 
-  useEffect(() => {
-    setDraftColor(primaryColor);
-  }, [primaryColor]);
 
   return (
     <section className="rounded-xl border border-blue-100 bg-white p-5 shadow-sm">

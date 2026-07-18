@@ -5,6 +5,7 @@ export interface AuthUser {
   name: string;
   role: Role;
   email: string;
+  schoolId: number | null;
 }
 
 export function roleToDashboardPath(role: Role) {

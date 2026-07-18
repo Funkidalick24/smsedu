@@ -8,7 +8,7 @@
 
 ## Epic 2: Multi-Tenant and Governance Controls (P0)
 - Build school/tenant management module (create, suspend, configure).
-- Build admin account lifecycle management (invite, role changes, deactivate).
+- [x] Add a DB-backed admin account inventory page showing platform/school leadership accounts. Invite, role-change, and deactivate actions remain pending.
 - Build platform-wide policy controls (password policy, session policy, feature flags).
 - Done when: super admin can govern tenants and platform admins from dashboard-linked pages.
 

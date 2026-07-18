@@ -64,6 +64,34 @@ function getRoleId(db: Database.Database, role: string) {
   return row.id;
 }
 
+
+function seedDefaultSchool(db: Database.Database) {
+  if (!tableExists(db, "schools")) {
+    return;
+  }
+  db.prepare(
+    `
+    INSERT OR IGNORE INTO schools (name, code, level, district, province, status)
+    VALUES (?, ?, ?, ?, ?, ?)
+  `,
+  ).run("SMSEdu Demonstration School", "SMSDEMO", "Combined", "Demo District", "Demo Province", "active");
+}
+
+function getDefaultSchoolId(db: Database.Database) {
+  if (!tableExists(db, "schools")) {
+    return null;
+  }
+  const row = db.prepare("SELECT id FROM schools WHERE code = ?").get("SMSDEMO") as { id: number } | undefined;
+  return row?.id ?? null;
+}
+
+function columnExists(db: Database.Database, tableName: string, columnName: string) {
+  return db
+    .prepare(`PRAGMA table_info(${tableName})`)
+    .all()
+    .some((row) => (row as { name: string }).name === columnName);
+}
+
 function seedUsers(db: Database.Database) {
   const now = new Date().toISOString();
   const password = process.env.DEFAULT_PASSWORD ?? "Admin123!";
@@ -76,14 +104,27 @@ function seedUsers(db: Database.Database) {
     { email: "principal@smsedu.local", fullName: "Paula Principal", role: "principal" },
     { email: "headmaster@smsedu.local", fullName: "Henry Headmaster", role: "headmaster" },
   ] as const;
-  const insertUser = db.prepare(`
-    INSERT OR IGNORE INTO users (email, full_name, password_hash, role_id, created_at, updated_at)
-    VALUES (?, ?, ?, ?, ?, ?)
-  `);
+  const defaultSchoolId = getDefaultSchoolId(db);
+  const hasSchoolId = columnExists(db, "users", "school_id");
+  const insertUser = db.prepare(
+    hasSchoolId
+      ? `
+        INSERT OR IGNORE INTO users (email, full_name, password_hash, role_id, school_id, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+      `
+      : `
+        INSERT OR IGNORE INTO users (email, full_name, password_hash, role_id, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?)
+      `,
+  );
 
   const tx = db.transaction(() => {
     for (const user of defaultUsers) {
-      insertUser.run(user.email, user.fullName, hashPassword(password), getRoleId(db, user.role), now, now);
+      if (hasSchoolId) {
+        insertUser.run(user.email, user.fullName, hashPassword(password), getRoleId(db, user.role), defaultSchoolId, now, now);
+      } else {
+        insertUser.run(user.email, user.fullName, hashPassword(password), getRoleId(db, user.role), now, now);
+      }
     }
   });
 
@@ -414,6 +455,7 @@ function seed(db: Database.Database) {
   upsertRole(db, "superadmin");
   upsertRole(db, "principal");
   upsertRole(db, "headmaster");
+  seedDefaultSchool(db);
   seedUsers(db);
   seedAcademicData(db);
   seedStudentLearningData(db);
