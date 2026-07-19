@@ -4,10 +4,10 @@ import { listClassOptions, listSubjectOptions, listTeachers } from "@/lib/server
 import { requireDashboardRole } from "@/lib/server/pageAuth";
 
 export default async function AdminTeachersPage() {
-  await requireDashboardRole("admin");
-  const teachers = listTeachers();
-  const classes = listClassOptions();
-  const subjects = listSubjectOptions();
+  const user = await requireDashboardRole("admin");
+  const teachers = listTeachers(user.schoolId!);
+  const classes = listClassOptions(user.schoolId!);
+  const subjects = listSubjectOptions(user.schoolId!);
 
   return (
     <DashboardLayout role="admin">

@@ -8,13 +8,17 @@ export async function GET() {
     return NextResponse.json({ ok: false, message: "Unauthorized" }, { status: 401 });
   }
 
-  const studentId = resolveStudentId(user.id);
+  if (!user.schoolId) {
+    return NextResponse.json({ ok: false, message: "Tenant context not found." }, { status: 403 });
+  }
+
+  const studentId = resolveStudentId(user.id, user.schoolId);
   if (!studentId) {
     return NextResponse.json({ ok: false, message: "Student profile not found." }, { status: 404 });
   }
 
   return NextResponse.json({
     ok: true,
-    subjects: loadStudentSubjects(studentId),
+    subjects: loadStudentSubjects(studentId, user.schoolId),
   });
 }

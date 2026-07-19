@@ -1,8 +1,8 @@
 import { getAdminStats, getClassroomSnapshot } from "./adminRepository";
 
-export function loadAdminDashboard() {
+export function loadAdminDashboard(schoolId: number) {
   return {
-    stats: getAdminStats(),
-    classroomSnapshot: getClassroomSnapshot(),
+    stats: getAdminStats(schoolId),
+    classroomSnapshot: getClassroomSnapshot(schoolId),
   };
 }

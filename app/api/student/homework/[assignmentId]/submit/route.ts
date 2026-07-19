@@ -26,7 +26,11 @@ export async function POST(
     return NextResponse.json({ ok: false, message: "Unauthorized" }, { status: 401 });
   }
 
-  const studentId = resolveStudentId(user.id);
+  if (!user.schoolId) {
+    return NextResponse.json({ ok: false, message: "Tenant context not found." }, { status: 403 });
+  }
+
+  const studentId = resolveStudentId(user.id, user.schoolId);
   if (!studentId) {
     return NextResponse.json({ ok: false, message: "Student profile not found." }, { status: 404 });
   }
@@ -60,7 +64,7 @@ export async function POST(
   }
 
   try {
-    createStudentSubmission(studentId, Number(assignmentIdParam), { submissionText, attachmentUrl });
+    createStudentSubmission(studentId, user.schoolId, Number(assignmentIdParam), { submissionText, attachmentUrl });
     logAudit(user.id, "student.assignment.submitted", "assignment", assignmentIdParam, {
       studentId,
       hasAttachment: Boolean(attachmentUrl),

@@ -52,12 +52,15 @@ export async function GET() {
   if (!user) {
     return NextResponse.json({ ok: false, message: "Unauthorized" }, { status: 401 });
   }
+  if (!user.schoolId) {
+    return NextResponse.json({ ok: false, message: "Tenant context not found." }, { status: 403 });
+  }
 
   return NextResponse.json({
     ok: true,
-    classes: listClasses(),
-    teachers: listTeacherOptions(),
-    subjects: listSubjectOptions(),
+    classes: listClasses(user.schoolId),
+    teachers: listTeacherOptions(user.schoolId),
+    subjects: listSubjectOptions(user.schoolId),
   });
 }
 
@@ -65,6 +68,9 @@ export async function POST(request: Request) {
   const user = await requireRole(["admin", "superadmin"]);
   if (!user) {
     return NextResponse.json({ ok: false, message: "Unauthorized" }, { status: 401 });
+  }
+  if (!user.schoolId) {
+    return NextResponse.json({ ok: false, message: "Tenant context not found." }, { status: 403 });
   }
 
   const body = (await request.json()) as CreateClassBody;
@@ -148,6 +154,7 @@ export async function POST(request: Request) {
       passingScore: typeof body.passingScore === "number" ? body.passingScore : undefined,
       notes: body.notes?.trim(),
       createdByUserId: user.id,
+      schoolId: user.schoolId,
       subjects,
     });
     return NextResponse.json({ ok: true, classRecord: created });

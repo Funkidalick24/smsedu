@@ -93,16 +93,28 @@ function getTodayIso() {
   return new Date().toISOString().split("T")[0];
 }
 
-export function getStudentIdForUser(userId: number) {
+export function getStudentIdForUser(userId: number, schoolId: number) {
   ensureDbReady();
   const db = getDb();
-  const row = db.prepare("SELECT id FROM students WHERE user_id = ?").get(userId) as { id: number } | undefined;
+  const row = db
+    .prepare("SELECT id FROM students WHERE user_id = ? AND school_id = ?")
+    .get(userId, schoolId) as { id: number } | undefined;
   return row?.id ?? null;
 }
 
-export function getStudentDashboard(studentId: number) {
+function assertStudentInSchool(studentId: number, schoolId: number) {
+  const row = getDb()
+    .prepare("SELECT id FROM students WHERE id = ? AND school_id = ?")
+    .get(studentId, schoolId) as { id: number } | undefined;
+  if (!row) {
+    throw new Error("Student profile is not available for the current tenant.");
+  }
+}
+
+export function getStudentDashboard(studentId: number, schoolId: number) {
   ensureDbReady();
   const db = getDb();
+  assertStudentInSchool(studentId, schoolId);
   const today = getTodayIso();
 
   const attendancePct =
@@ -314,9 +326,10 @@ export function getStudentDashboard(studentId: number) {
   };
 }
 
-export function listStudentSubjects(studentId: number) {
+export function listStudentSubjects(studentId: number, schoolId: number) {
   ensureDbReady();
   const db = getDb();
+  assertStudentInSchool(studentId, schoolId);
 
   const rows = db
     .prepare(
@@ -434,9 +447,10 @@ export function listStudentSubjects(studentId: number) {
   });
 }
 
-export function listStudentHomework(studentId: number, subjectId?: number | null, statusFilter?: string | null) {
+export function listStudentHomework(studentId: number, schoolId: number, subjectId?: number | null, statusFilter?: string | null) {
   ensureDbReady();
   const db = getDb();
+  assertStudentInSchool(studentId, schoolId);
   const today = getTodayIso();
 
   const rows = db
@@ -527,11 +541,13 @@ export function listStudentHomework(studentId: number, subjectId?: number | null
 
 export function submitStudentHomework(
   studentId: number,
+  schoolId: number,
   assignmentId: number,
   input: { submissionText: string; attachmentUrl: string },
 ) {
   ensureDbReady();
   const db = getDb();
+  assertStudentInSchool(studentId, schoolId);
 
   const assignment = db
     .prepare(
@@ -606,9 +622,10 @@ export function submitStudentHomework(
   }
 }
 
-export function listStudentResults(studentId: number) {
+export function listStudentResults(studentId: number, schoolId: number) {
   ensureDbReady();
   const db = getDb();
+  assertStudentInSchool(studentId, schoolId);
 
   const rows = db
     .prepare(
