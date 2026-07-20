@@ -104,6 +104,7 @@ export interface CreateClassInput {
   passingScore?: number;
   notes?: string;
   createdByUserId: number;
+  schoolId: number;
   subjects: CreateClassSubjectInput[];
 }
 
@@ -159,6 +160,7 @@ export interface CreateStudentInput {
   bloodType?: string;
   specialNeeds?: string;
   classId: number | null;
+  schoolId: number;
 }
 
 export interface CreateTeacherInput {
@@ -215,6 +217,7 @@ export interface CreateTeacherInput {
   emergencyContactAltPhone?: string;
   classIds: number[];
   subjectIds: number[];
+  schoolId: number;
 }
 
 export interface TeacherDetail {
@@ -282,13 +285,13 @@ export interface TeacherDocumentRow {
   uploadedAt: string;
 }
 
-export function getAdminStats() {
+export function getAdminStats(schoolId: number) {
   ensureDbReady();
   const db = getDb();
 
-  const totalStudents = (db.prepare("SELECT COUNT(*) as count FROM students").get() as { count: number }).count;
-  const totalTeachers = (db.prepare("SELECT COUNT(*) as count FROM teachers").get() as { count: number }).count;
-  const totalClasses = (db.prepare("SELECT COUNT(*) as count FROM classes").get() as { count: number }).count;
+  const totalStudents = (db.prepare("SELECT COUNT(*) as count FROM students WHERE school_id = ?").get(schoolId) as { count: number }).count;
+  const totalTeachers = (db.prepare("SELECT COUNT(*) as count FROM teachers WHERE school_id = ?").get(schoolId) as { count: number }).count;
+  const totalClasses = (db.prepare("SELECT COUNT(*) as count FROM classes WHERE school_id = ?").get(schoolId) as { count: number }).count;
   const attendance = (db
     .prepare(
       `
@@ -298,10 +301,10 @@ export function getAdminStats() {
           1
         ) as pct
       FROM attendance
-      WHERE date >= date('now', '-30 days')
+      WHERE school_id = ? AND date >= date('now', '-30 days')
     `,
     )
-    .get() as { pct: number | null }).pct;
+    .get(schoolId) as { pct: number | null }).pct;
 
   const stats: AdminStat[] = [
     { title: "Total Students", value: totalStudents.toLocaleString(), trend: "Live from DB" },
@@ -313,7 +316,7 @@ export function getAdminStats() {
   return stats;
 }
 
-export function getClassroomSnapshot() {
+export function getClassroomSnapshot(schoolId: number) {
   ensureDbReady();
   const db = getDb();
 
@@ -330,11 +333,12 @@ export function getClassroomSnapshot() {
       FROM classes c
       LEFT JOIN class_enrollments ce ON ce.class_id = c.id
       LEFT JOIN attendance a ON a.class_id = c.id AND a.date >= date('now', '-30 days')
+      WHERE c.school_id = ?
       GROUP BY c.id, c.name
       ORDER BY c.name
     `,
     )
-    .all() as Array<{ class_name: string; student_count: number; attendance_pct: number | null }>;
+    .all(schoolId) as Array<{ class_name: string; student_count: number; attendance_pct: number | null }>;
 
   return rows.map(
     (row) =>
@@ -347,7 +351,7 @@ export function getClassroomSnapshot() {
   );
 }
 
-export function listStudents() {
+export function listStudents(schoolId: number) {
   ensureDbReady();
   const db = getDb();
   return db
@@ -369,11 +373,12 @@ export function listStudents() {
       LEFT JOIN class_enrollments ce ON ce.student_id = s.id
       LEFT JOIN classes c ON c.id = ce.class_id
       LEFT JOIN attendance a ON a.student_id = s.id AND a.date >= date('now', '-30 days')
+      WHERE s.school_id = ?
       GROUP BY s.id, s.admission_no, s.first_name, s.last_name, u.full_name, u.email, s.grade_level
       ORDER BY s.grade_level, display_name
     `,
     )
-    .all()
+    .all(schoolId)
     .map(
       (row) =>
         ({
@@ -388,7 +393,7 @@ export function listStudents() {
     );
 }
 
-export function listClassOptions() {
+export function listClassOptions(schoolId: number) {
   ensureDbReady();
   const db = getDb();
   return db
@@ -396,10 +401,11 @@ export function listClassOptions() {
       `
       SELECT id, name
       FROM classes
+      WHERE school_id = ?
       ORDER BY name
     `,
     )
-    .all()
+    .all(schoolId)
     .map(
       (row) =>
         ({
@@ -409,7 +415,7 @@ export function listClassOptions() {
     );
 }
 
-export function listSubjectOptions() {
+export function listSubjectOptions(schoolId: number) {
   ensureDbReady();
   const db = getDb();
   return db
@@ -417,10 +423,11 @@ export function listSubjectOptions() {
       `
       SELECT id, name, COALESCE(code, '') as code
       FROM subjects
+      WHERE school_id = ?
       ORDER BY name
     `,
     )
-    .all()
+    .all(schoolId)
     .map(
       (row) =>
         ({
@@ -431,7 +438,7 @@ export function listSubjectOptions() {
     );
 }
 
-export function listTeacherOptions() {
+export function listTeacherOptions(schoolId: number) {
   ensureDbReady();
   const db = getDb();
   return db
@@ -442,10 +449,11 @@ export function listTeacherOptions() {
         COALESCE(TRIM(t.first_name || ' ' || t.last_name), u.full_name) as display_name
       FROM teachers t
       JOIN users u ON u.id = t.user_id
+      WHERE t.school_id = ?
       ORDER BY display_name
     `,
     )
-    .all()
+    .all(schoolId)
     .map(
       (row) =>
         ({
@@ -520,10 +528,11 @@ export function createClass(input: CreateClassInput) {
           notes,
           status,
           created_by_user_id,
+          school_id,
           created_at,
           updated_at
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
       `,
       )
       .run(
@@ -552,6 +561,7 @@ export function createClass(input: CreateClassInput) {
         passingScore,
         input.notes?.trim() || null,
         input.createdByUserId,
+        input.schoolId,
       );
 
     const classId = Number(classInsert.lastInsertRowid);
@@ -667,11 +677,11 @@ export function createStudent(input: CreateStudentInput) {
     const userInsert = db
       .prepare(
         `
-      INSERT INTO users (email, full_name, password_hash, role_id, created_at, updated_at)
-      VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+      INSERT INTO users (email, full_name, password_hash, role_id, school_id, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
     `,
       )
-      .run(email, fullName, hashPassword(defaultPassword), roleRow.id);
+      .run(email, fullName, hashPassword(defaultPassword), roleRow.id, input.schoolId);
 
     const userId = Number(userInsert.lastInsertRowid);
     const studentInsert = db
@@ -679,6 +689,7 @@ export function createStudent(input: CreateStudentInput) {
         `
       INSERT INTO students (
         user_id,
+        school_id,
         admission_no,
         grade_level,
         school_level,
@@ -711,11 +722,12 @@ export function createStudent(input: CreateStudentInput) {
         home_language,
         extracurricular_interests
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `,
       )
       .run(
         userId,
+        input.schoolId,
         admissionNo,
         gradeLevel,
         input.schoolLevel === "Secondary" ? "Secondary" : "Primary",
@@ -890,11 +902,11 @@ export function createTeacher(input: CreateTeacherInput) {
     const userInsert = db
       .prepare(
         `
-      INSERT INTO users (email, full_name, password_hash, role_id, created_at, updated_at)
-      VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+      INSERT INTO users (email, full_name, password_hash, role_id, school_id, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
     `,
       )
-      .run(email, fullName, hashPassword(defaultPassword), roleRow.id);
+      .run(email, fullName, hashPassword(defaultPassword), roleRow.id, input.schoolId);
 
     const userId = Number(userInsert.lastInsertRowid);
     const teacherInsert = db
@@ -902,6 +914,7 @@ export function createTeacher(input: CreateTeacherInput) {
         `
       INSERT INTO teachers (
         user_id,
+        school_id,
         employee_no,
         first_name,
         middle_name,
@@ -959,6 +972,7 @@ export function createTeacher(input: CreateTeacherInput) {
       )
       .run(
         userId,
+        input.schoolId,
         employeeNo,
         firstName,
         middleName,
@@ -1098,7 +1112,7 @@ export function createTeacher(input: CreateTeacherInput) {
   };
 }
 
-export function listTeachers() {
+export function listTeachers(schoolId: number) {
   ensureDbReady();
   const db = getDb();
   return db
@@ -1120,11 +1134,12 @@ export function listTeachers() {
       LEFT JOIN subjects s ON s.id = ts.subject_id
       LEFT JOIN teacher_classes tc ON tc.teacher_id = t.id
       LEFT JOIN classes c ON c.id = tc.class_id
+      WHERE t.school_id = ?
       GROUP BY t.id, t.employee_no, t.first_name, t.last_name, u.full_name, u.email, t.department, t.status
       ORDER BY display_name
     `,
     )
-    .all()
+    .all(schoolId)
     .map(
       (row) =>
         ({
@@ -1141,7 +1156,7 @@ export function listTeachers() {
     );
 }
 
-export function listClasses() {
+export function listClasses(schoolId: number) {
   ensureDbReady();
   const db = getDb();
   return db
@@ -1171,11 +1186,12 @@ export function listClasses() {
       LEFT JOIN class_subjects cs ON cs.class_id = c.id
       LEFT JOIN subjects s ON s.id = cs.subject_id
       LEFT JOIN attendance a ON a.class_id = c.id AND a.date >= date('now', '-30 days')
+      WHERE c.school_id = ?
       GROUP BY c.id, c.name, c.section_stream, c.academic_year, c.term_label, tm.name, c.grade_level, u.full_name, c.max_students, c.status
       ORDER BY c.name
     `,
     )
-    .all()
+    .all(schoolId)
     .map(
       (row) =>
         ({

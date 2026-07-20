@@ -7,9 +7,12 @@ export async function GET() {
   if (!user) {
     return NextResponse.json({ ok: false, message: "Unauthorized" }, { status: 401 });
   }
+  if (!user.schoolId) {
+    return NextResponse.json({ ok: false, message: "Tenant context not found." }, { status: 403 });
+  }
 
   return NextResponse.json({
     ok: true,
-    ...loadAdminDashboard(),
+    ...loadAdminDashboard(user.schoolId),
   });
 }

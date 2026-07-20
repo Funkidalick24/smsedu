@@ -4,9 +4,9 @@ import { listClassOptions, listStudents } from "@/lib/server/adminRepository";
 import { requireDashboardRole } from "@/lib/server/pageAuth";
 
 export default async function AdminStudentsPage() {
-  await requireDashboardRole("admin");
-  const students = listStudents();
-  const classes = listClassOptions();
+  const user = await requireDashboardRole("admin");
+  const students = listStudents(user.schoolId!);
+  const classes = listClassOptions(user.schoolId!);
 
   return (
     <DashboardLayout role="admin">

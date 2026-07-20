@@ -10,7 +10,11 @@ export async function GET(request: Request) {
     return NextResponse.json({ ok: false, message: "Unauthorized" }, { status: 401 });
   }
 
-  const studentId = resolveStudentId(user.id);
+  if (!user.schoolId) {
+    return NextResponse.json({ ok: false, message: "Tenant context not found." }, { status: 403 });
+  }
+
+  const studentId = resolveStudentId(user.id, user.schoolId);
   if (!studentId) {
     return NextResponse.json({ ok: false, message: "Student profile not found." }, { status: 404 });
   }
@@ -23,6 +27,6 @@ export async function GET(request: Request) {
 
   return NextResponse.json({
     ok: true,
-    homework: loadStudentHomework(studentId, subjectId, status),
+    homework: loadStudentHomework(studentId, user.schoolId, subjectId, status),
   });
 }

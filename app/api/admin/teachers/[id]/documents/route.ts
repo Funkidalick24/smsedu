@@ -21,6 +21,9 @@ export async function GET(_request: Request, context: RouteContext) {
   if (!user) {
     return NextResponse.json({ ok: false, message: "Unauthorized" }, { status: 401 });
   }
+  if (!user.schoolId) {
+    return NextResponse.json({ ok: false, message: "Tenant context not found." }, { status: 403 });
+  }
 
   const { id } = await context.params;
   const teacherId = parseTeacherId(id);
@@ -39,6 +42,9 @@ export async function POST(request: Request, context: RouteContext) {
   const user = await requireRole(["admin", "superadmin"]);
   if (!user) {
     return NextResponse.json({ ok: false, message: "Unauthorized" }, { status: 401 });
+  }
+  if (!user.schoolId) {
+    return NextResponse.json({ ok: false, message: "Tenant context not found." }, { status: 403 });
   }
 
   const { id } = await context.params;

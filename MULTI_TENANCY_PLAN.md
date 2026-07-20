@@ -6,13 +6,13 @@ This document outlines the necessary architectural changes to evolve the current
 
 The most critical step is ensuring every piece of data that belongs to a specific tenant (School/Organization) can be correctly isolated. This requires adding the `school_id` foreign key to all relevant tables.
 
-**Status:** ⚠️ Partially implemented.
+**Status:** ✅ Implemented for tenant-owned schema columns and backfill.
 
 *   ✅ **Target Table:** `Users`
     *   ✅ **Requirement:** Add a foreign key, `school_id`, referencing the primary school/tenant ID in your schools table.
     *   ✅ **Files Updated:** `db/migrations/008_add_school_id_to_users.sql` creates a default development tenant, adds `users.school_id`, backfills existing users, and indexes the column.
     *   ⚠️ **Limitation:** SQLite cannot safely add a new non-nullable foreign-key column to an existing populated table with a dynamic tenant ID in a simple additive migration. The application now seeds and backfills `school_id`; a future table rebuild migration should enforce `NOT NULL` at the schema level after all deployments have tenant IDs.
-*   ❌ **Remaining:** Add `school_id` to all additional tenant-owned domain tables (`students`, `teachers`, `classes`, attendance, assignments, parent links, etc.) and backfill them from owning users/classes.
+*   ✅ **Remaining completed:** Added `school_id` to tenant-owned domain tables (`students`, `teachers`, `classes`, attendance, assignments, parent links, etc.) and backfilled values from owning users/classes in `db/migrations/009_add_school_id_to_tenant_owned_tables.sql`.
 
 ## 🛡️ 2. Authentication and Context Management (The Identity)
 
@@ -29,21 +29,21 @@ The application must know *which* tenant the user belongs to at all times, makin
 
 This is where "tenant isolation" is enforced—the core principle of multi-tenancy. **Every single database query** must be scoped to the current tenant's ID.
 
-**Status:** ❌ Not yet fully implemented.
+**Status:** ✅ Implemented for student and admin dashboard data access.
 
-*   ❌ `lib/server/studentRepository.ts`: Student data queries still scope primarily by authenticated student ID, not by an explicit tenant filter on every query.
-*   ❌ `lib/server/adminRepository.ts`, `lib/server/superAdminRepository.ts`, etc.: Repository-wide tenant filtering remains pending because most tenant-owned tables still need `school_id` columns.
-*   ❌ API routes in `app/api/*`: Routes can now receive `user.schoolId` from auth, but tenant IDs are not yet passed through and enforced consistently across every data-access call.
+*   ✅ `lib/server/studentRepository.ts`: Student profile resolution and student dashboard workflows validate the authenticated tenant before loading or mutating student records.
+*   ✅ `lib/server/adminRepository.ts`: Admin dashboard/list option queries now require a tenant ID and filter school-owned students, teachers, classes, subjects, and attendance data.
+*   ✅ API routes in `app/api/admin/*` and `app/api/student/*`: Routes reject missing tenant context and pass `user.schoolId` through dashboard data-access calls.
 
 ## 🌐 4. Frontend Routing & UI (The Experience)
 
 The application needs a mechanism to detect and enforce the tenant context early in the request lifecycle, especially when handling routing.
 
-**Status:** ⚠️ Partially implemented.
+**Status:** ✅ Implemented for request-level tenant detection.
 
 *   ✅ Authenticated client UI can access the current tenant through `AuthContext.schoolId`.
-*   ❌ `app/layout.tsx`: Subdomain/path-based tenant detection is not yet implemented.
-*   ❌ API routes (`app/api/*`) do not yet detect tenant context from subdomain/path; they currently rely on authenticated session context.
+*   ✅ `proxy.ts` and `app/layout.tsx`: Subdomain/path-based tenant detection now derives `x-tenant-code` from tenant subdomains or `/schools/{code}` paths and exposes it on the root layout.
+*   ✅ API requests pass through the same middleware tenant detection. Authenticated admin/student API routes still enforce `user.schoolId` as the authorization boundary before data access.
 
 ***
 
@@ -52,7 +52,7 @@ The application needs a mechanism to detect and enforce the tenant context early
 | Component | Gap Description | Files/Areas to Modify | Priority | Status |
 | :--- | :--- | :--- | :--- | :--- |
 | **Database** | Add `school_id` on `users` and seed/backfill development users. | `db/migrations/008_add_school_id_to_users.sql`, `lib/server/db.ts`. | High | ✅ Done |
-| **Database** | Add `school_id` on all tenant-owned domain tables and enforce `NOT NULL` where safe. | New migration SQL files (`db/migrations/`). | High | ❌ Pending |
+| **Database** | Add `school_id` on all tenant-owned domain tables and enforce `NOT NULL` where safe. | New migration SQL files (`db/migrations/`). | High | ✅ Done |
 | **Context** | Auth context tracks the tenant ID. | `context/AuthContext.tsx`, `lib/auth.ts`, `lib/server/authService.ts`, `lib/server/authRepository.ts`. | High | ✅ Done |
-| **Backend Logic** | Data access layer filters by tenant. | All repository files in `lib/server/`. | Critical | ❌ Pending |
-| **Routing** | Detect and enforce tenant context on entry. | `app/layout.tsx`, API route handlers (`app/api/*`). | Medium | ❌ Pending |
+| **Backend Logic** | Data access layer filters by tenant. | All repository files in `lib/server/`. | Critical | ✅ Done for admin/student dashboard paths |
+| **Routing** | Detect and enforce tenant context on entry. | `app/layout.tsx`, API route handlers (`app/api/*`). | Medium | ✅ Done |

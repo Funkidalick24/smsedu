@@ -447,6 +447,34 @@ function seedStudentLearningData(db: Database.Database) {
   tx();
 }
 
+function syncTenantOwnedSchoolIds(db: Database.Database) {
+  if (!tableExists(db, "schools") || !columnExists(db, "users", "school_id")) {
+    return;
+  }
+  const defaultSchoolId = getDefaultSchoolId(db);
+  if (!defaultSchoolId) {
+    return;
+  }
+  const statements = [
+    "UPDATE users SET school_id = ? WHERE school_id IS NULL",
+    "UPDATE teachers SET school_id = (SELECT school_id FROM users WHERE users.id = teachers.user_id) WHERE school_id IS NULL AND EXISTS (SELECT 1 FROM pragma_table_info('teachers') WHERE name = 'school_id')",
+    "UPDATE students SET school_id = (SELECT school_id FROM users WHERE users.id = students.user_id) WHERE school_id IS NULL AND EXISTS (SELECT 1 FROM pragma_table_info('students') WHERE name = 'school_id')",
+    "UPDATE classes SET school_id = COALESCE((SELECT school_id FROM teachers WHERE teachers.id = classes.teacher_id), ?) WHERE school_id IS NULL AND EXISTS (SELECT 1 FROM pragma_table_info('classes') WHERE name = 'school_id')",
+    "UPDATE subjects SET school_id = ? WHERE school_id IS NULL AND EXISTS (SELECT 1 FROM pragma_table_info('subjects') WHERE name = 'school_id')",
+    "UPDATE class_enrollments SET school_id = (SELECT school_id FROM classes WHERE classes.id = class_enrollments.class_id) WHERE school_id IS NULL AND EXISTS (SELECT 1 FROM pragma_table_info('class_enrollments') WHERE name = 'school_id')",
+    "UPDATE attendance SET school_id = (SELECT school_id FROM classes WHERE classes.id = attendance.class_id) WHERE school_id IS NULL AND EXISTS (SELECT 1 FROM pragma_table_info('attendance') WHERE name = 'school_id')",
+    "UPDATE assignments SET school_id = (SELECT school_id FROM classes WHERE classes.id = assignments.class_id) WHERE school_id IS NULL AND EXISTS (SELECT 1 FROM pragma_table_info('assignments') WHERE name = 'school_id')",
+    "UPDATE assignment_submissions SET school_id = (SELECT school_id FROM students WHERE students.id = assignment_submissions.student_id) WHERE school_id IS NULL AND EXISTS (SELECT 1 FROM pragma_table_info('assignment_submissions') WHERE name = 'school_id')",
+    "UPDATE assessments SET school_id = (SELECT school_id FROM classes WHERE classes.id = assessments.class_id) WHERE school_id IS NULL AND EXISTS (SELECT 1 FROM pragma_table_info('assessments') WHERE name = 'school_id')",
+    "UPDATE assessment_scores SET school_id = (SELECT school_id FROM students WHERE students.id = assessment_scores.student_id) WHERE school_id IS NULL AND EXISTS (SELECT 1 FROM pragma_table_info('assessment_scores') WHERE name = 'school_id')",
+    "UPDATE announcements SET school_id = COALESCE((SELECT school_id FROM classes WHERE classes.id = announcements.class_id), ?) WHERE school_id IS NULL AND EXISTS (SELECT 1 FROM pragma_table_info('announcements') WHERE name = 'school_id')",
+    "UPDATE subject_resources SET school_id = (SELECT school_id FROM classes WHERE classes.id = subject_resources.class_id) WHERE school_id IS NULL AND EXISTS (SELECT 1 FROM pragma_table_info('subject_resources') WHERE name = 'school_id')",
+  ];
+  for (const sql of statements) {
+    db.prepare(sql).run(defaultSchoolId);
+  }
+}
+
 function seed(db: Database.Database) {
   upsertRole(db, "admin");
   upsertRole(db, "teacher");
@@ -459,6 +487,7 @@ function seed(db: Database.Database) {
   seedUsers(db);
   seedAcademicData(db);
   seedStudentLearningData(db);
+  syncTenantOwnedSchoolIds(db);
 }
 
 export function getDb() {
